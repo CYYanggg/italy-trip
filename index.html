@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>義大利自由行行程</title>
+  <title>北義探險去</title>
   <style>
     :root {
       --bg: #f5f5f4;
@@ -13,16 +13,8 @@
       --line: #e7e5e4;
       --primary: #111827;
       --soft: #fafaf9;
-      --rose: #fff1f2;
-      --cyan: #ecfeff;
-      --amber: #fffbeb;
-      --slate: #f8fafc;
-      --emerald: #ecfdf5;
-      --violet: #f5f3ff;
       --shadow: 0 8px 24px rgba(28, 25, 23, 0.06);
-      --radius: 22px;
     }
-
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
@@ -32,205 +24,72 @@
       color: var(--text);
       line-height: 1.6;
     }
-
     a { color: inherit; text-decoration: none; }
-    .wrap {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 18px 14px 36px;
-    }
-
-    .hero, .panel, .day-card {
-      background: var(--card);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-    }
-
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 18px 14px 36px; }
+    .hero, .panel, .day-card { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); }
     .hero { padding: 22px 20px; margin-bottom: 14px; }
     .eyebrow { font-size: 12px; color: #78716c; margin-bottom: 8px; }
     h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; }
-    .sub { margin-top: 10px; color: var(--muted); font-size: 15px; }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 14px;
-    }
-    .stat {
-      background: var(--soft);
-      border-radius: 18px;
-      padding: 12px;
-    }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .stat { background: var(--soft); border-radius: 18px; padding: 12px; }
     .stat .k { font-size: 12px; color: #78716c; }
     .stat .v { margin-top: 4px; font-size: 13px; font-weight: 700; }
-
-    .toolbar {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
-    }
+    .toolbar { display: flex; flex-direction: column; gap: 12px; padding: 14px; margin-bottom: 14px; }
     .toolbar-title { font-size: 13px; font-weight: 700; color: #44403c; margin-bottom: 8px; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip {
-      border: 1px solid var(--line);
-      background: white;
-      color: #44403c;
-      border-radius: 999px;
-      padding: 9px 14px;
-      font-size: 14px;
-      cursor: pointer;
+    .chip, .mode-btn {
+      border: 1px solid var(--line); background: white; color: #44403c; border-radius: 999px;
+      padding: 9px 14px; font-size: 14px; cursor: pointer;
     }
-    .chip.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-    .mode-btn {
-      border: 1px solid var(--line);
-      background: white;
-      color: #44403c;
-      border-radius: 999px;
-      padding: 9px 14px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .mode-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
+    .chip.active, .mode-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .layout { display: grid; grid-template-columns: 1fr; gap: 14px; }
     .sidebar { display: grid; gap: 14px; }
     .panel { padding: 16px; }
     .panel h2 { margin: 0 0 12px; font-size: 18px; }
-
     .day-list { display: grid; gap: 10px; }
     .day-btn {
-      width: 100%;
-      text-align: left;
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 20px;
-      padding: 14px;
-      cursor: pointer;
+      width: 100%; text-align: left; border: 1px solid var(--line); background: white; border-radius: 20px; padding: 14px; cursor: pointer;
     }
-    .day-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
+    .day-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
     .day-date { font-size: 12px; opacity: 0.75; }
     .day-title { margin-top: 4px; font-weight: 700; }
     .day-area { margin-top: 6px; font-size: 14px; color: #57534e; }
     .day-btn.active .day-area { color: #e7e5e4; }
-
     .day-card { padding: 18px; }
     .day-head { border-bottom: 1px solid var(--line); padding-bottom: 14px; }
     .day-head h3 { margin: 4px 0 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.2; }
     .summary { margin-top: 10px; color: var(--muted); font-size: 15px; }
     .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .badge {
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      border: 1px solid var(--line);
-      background: var(--soft);
-    }
-
-    .content-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 18px;
-    }
-
+    .badge { padding: 8px 12px; border-radius: 999px; font-size: 13px; border: 1px solid var(--line); background: var(--soft); }
+    .content-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 18px; }
     .section-title { font-weight: 800; font-size: 14px; margin-bottom: 10px; color: #44403c; }
     .stack { display: grid; gap: 10px; }
-    .item {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 13px;
-      background: white;
-    }
-    .item-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: start;
-    }
+    .item, .food-card, .map-link { border: 1px solid var(--line); border-radius: 18px; padding: 13px; background: white; display: block; }
+    .schedule-link:hover, .food-card:hover, .map-link:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .item-top { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
     .item-name { font-weight: 700; }
     .item-time { font-size: 13px; color: #78716c; white-space: nowrap; }
-    .item-note { margin-top: 4px; font-size: 14px; color: var(--muted); }
-
-    .note-box {
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 14px;
-    }
+    .item-note, .food-note { margin-top: 4px; font-size: 14px; color: var(--muted); }
+    .note-box { border-radius: 18px; padding: 12px 14px; font-size: 14px; }
     .blue { background: #eff6ff; color: #1e3a8a; }
     .amber { background: #fffbeb; color: #92400e; }
     .green { background: #ecfdf5; color: #065f46; }
-
-    .map-link, .food-card {
-      display: block;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px;
-      background: white;
-    }
-    .map-link:hover, .food-card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
-    .food-note { margin-top: 4px; font-size: 14px; color: var(--muted); }
-    .tag {
-      display: inline-block;
-      margin-top: 8px;
-      background: var(--soft);
-      color: #57534e;
-      font-size: 12px;
-      padding: 5px 9px;
-      border-radius: 999px;
-    }
-
-    .quick-nav {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .quick-nav a {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
-      background: var(--soft);
-      font-size: 14px;
-    }
-
+    .tag { display: inline-block; margin-top: 8px; background: var(--soft); color: #57534e; font-size: 12px; padding: 5px 9px; border-radius: 999px; }
+    .quick-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .quick-nav a, .area-box { border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: var(--soft); font-size: 14px; }
     .helper-list { display: grid; gap: 10px; }
     .helper-list div { background: var(--soft); border-radius: 16px; padding: 12px; font-size: 14px; color: var(--muted); }
-
+    .museum-box { border: 1px dashed #d6d3d1; background: #fffefc; border-radius: 18px; padding: 14px; }
+    .museum-box ul { margin: 8px 0 0 18px; padding: 0; }
+    .museum-box li { margin-bottom: 6px; color: var(--muted); font-size: 14px; }
+    .area-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .area-node { padding: 10px 12px; border-radius: 14px; background: var(--soft); border: 1px solid var(--line); font-size: 13px; }
+    .arrow { color: #a8a29e; font-weight: 700; }
     @media (min-width: 960px) {
-      .hero {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 18px;
-        align-items: end;
-      }
-      .stats { margin-top: 0; }
-      .layout {
-        grid-template-columns: 330px minmax(0, 1fr);
-        align-items: start;
-      }
-      .content-grid {
-        grid-template-columns: 1.06fr 0.94fr;
-      }
-      .toolbar {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: start;
-      }
+      .hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items: end; }
+      .layout { grid-template-columns: 330px minmax(0, 1fr); align-items: start; }
+      .content-grid { grid-template-columns: 1.06fr 0.94fr; }
+      .toolbar { flex-direction: row; justify-content: space-between; align-items: start; }
     }
   </style>
 </head>
@@ -238,21 +97,19 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <div class="eyebrow">Italy trip dashboard</div>
-        <h1>義大利自由行互動式行程</h1>
-        <div class="sub">這是手機版旅途中最好用的單檔 HTML 行程頁。可切換城市、查看每日動線、快速打開 Google Maps、找附近餐廳與甜點，不需要 React，也更容易部署到 Vercel。</div>
+        <div class="eyebrow">Northern Italy trip dashboard</div>
+        <h1>北義探險去</h1>
       </div>
       <div class="stats">
-        <div class="stat"><div class="k">總天數</div><div class="v">11 天</div></div>
-        <div class="stat"><div class="k">城市</div><div class="v">米蘭 / 佛羅倫斯 / 威尼斯 / 科莫湖</div></div>
-        <div class="stat"><div class="k">風格</div><div class="v">藝術 × 建築 × 美食 × 慢旅</div></div>
-        <div class="stat"><div class="k">旅途重點</div><div class="v">每天導航 + 餐廳甜點</div></div>
+        <div class="stat"><div class="k">旅遊日期</div><div class="v">2026/4/3-4/12</div></div>
+        <div class="stat"><div class="k">城市</div><div class="v">Milan / Florence / Siena / Venice / Lake Como</div></div>
+        <div class="stat"><div class="k">風格</div><div class="v">Art × Architecture × Food × Slow Travel</div></div>
       </div>
     </section>
 
     <section class="toolbar panel">
       <div>
-        <div class="toolbar-title">城市篩選</div>
+        <div class="toolbar-title">City filter</div>
         <div class="chips" id="cityChips"></div>
       </div>
       <div>
@@ -264,17 +121,17 @@
     <section class="layout">
       <aside class="sidebar">
         <div class="panel">
-          <h2>每日總覽</h2>
-          <div class="day-list" id="dayList"></div>
-        </div>
-        <div class="panel">
           <h2>旅途中提醒</h2>
           <div class="helper-list">
-            <div>佛羅倫斯與威尼斯很多路段適合步行，不要把每天排太滿。</div>
+            <div>Florence 與 Venice 很多路段適合步行，不要把每天排太滿。</div>
             <div>復活節與免費博物館日人潮大，重點館請早到。</div>
-            <div>威尼斯與 Lake Como 船班、火車班次，當天務必再看一次。</div>
-            <div>米蘭 Centrale、Duomo、威尼斯熱門區域要留意扒手。</div>
+            <div>Venice 與 Lake Como 船班、火車班次，當天務必再看一次。</div>
+            <div>Milan Centrale、Duomo、Venice 熱門區域留意扒手。</div>
           </div>
+        </div>
+        <div class="panel">
+          <h2>每日總覽</h2>
+          <div class="day-list" id="dayList"></div>
         </div>
       </aside>
 
@@ -285,476 +142,259 @@
   </div>
 
   <script>
-    const tripDays = [
+    const savedSpots = [
       {
-        id: 1,
-        date: "4/2（四）",
-        title: "台灣 → 米蘭",
-        city: "Transit",
-        area: "桃園機場 → MXP",
-        stay: "飛機上",
-        summary: "夜間出發，主要是搭機與行前確認。",
-        mapQuery: "Taoyuan International Airport Terminal 2",
-        todos: ["前 48 小時完成線上 check-in", "確認護照、機票、保險、信用卡", "隨身行李放保暖外套與充電設備"],
-        tips: ["今天以休息為主。", "機上可先調整時差，盡量睡一段。"],
-        schedule: [
-          { time: "23:15", label: "第二航廈起飛", note: "建議提前完成報到與安檢" }
-        ],
-        food: [], desserts: []
+        name: "我的收藏店家 1",
+        link: "https://maps.app.goo.gl/x9DNAm5bmYWBXTz86",
+        recommend: "待補",
+        price: "待補",
+        hours: "待補"
       },
       {
-        id: 2,
-        date: "4/3（五）",
-        title: "米蘭 → 佛羅倫斯",
-        city: "Florence",
-        area: "MXP → Milano Centrale → Firenze SMN → 老城南側",
-        stay: "Hostel Archi Rossi",
-        summary: "移動日，抵達後以 2–3 個景點為主，傍晚走老橋與米開朗基羅廣場看日落。",
-        mapQuery: "Palazzo Vecchio Florence",
-        transport: ["Malpensa Express：MXP → Milano Centrale（約 50 分）", "Italo：米蘭 → 佛羅倫斯（約 2 小時）"],
-        tips: ["太陽下山後會降溫，記得帶外套。", "今天不要排太滿，重點是順利轉車與適應時差。"],
-        schedule: [
-          { time: "07:50", label: "抵達米蘭第一航廈", note: "先出關後搭 Malpensa Express" },
-          { time: "上午", label: "Mercato Centrale Milano 吃早餐 / 早午餐", note: "中央市場方便補給" },
-          { time: "中午前後", label: "Italo 前往佛羅倫斯", note: "抵達後可先寄放行李" },
-          { time: "15:00 後", label: "Hostel Archi Rossi check-in", note: "先稍微休息再出門" },
-          { time: "下午", label: "Palazzo Vecchio", note: "若體力普通，可先在領主廣場一帶慢慢走" },
-          { time: "17:00", label: "Ponte Vecchio", note: "停留 30–60 分鐘拍照" },
-          { time: "18:30", label: "Piazzale Michelangelo", note: "推估約 19:40 日落，建議帶食物上去" }
-        ],
-        food: [
-          { name: "Mercato Centrale Milano", note: "米蘭中央市場，適合轉車空檔找東西吃", type: "餐廳", map: "Mercato Centrale Milano" },
-          { name: "All’Antico Vinaio", note: "佛羅倫斯知名佛卡夏，適合移動日快速補給", type: "餐廳", map: "All'Antico Vinaio Florence" },
-          { name: "La Prosciutteria Firenze", note: "冷肉拼盤、麵包，適合買了帶去看夕陽", type: "餐廳", map: "La Prosciutteria Firenze" }
-        ],
-        desserts: [
-          { name: "Gelateria dei Neri", note: "佛羅倫斯高人氣 gelato", type: "甜點", map: "Gelateria dei Neri Florence" },
-          { name: "Vivoli", note: "老牌甜點店，可順路買甜點", type: "甜點", map: "Vivoli Florence" }
-        ]
+        name: "我的收藏店家 2",
+        link: "https://maps.app.goo.gl/9xSUuJh3rAykmSYv8",
+        recommend: "待補",
+        price: "待補",
+        hours: "待補"
       },
       {
-        id: 3,
-        date: "4/4（六）",
-        title: "佛羅倫斯：Duomo 區與梅迪奇",
-        city: "Florence",
-        area: "Duomo 區",
-        stay: "Hostel Archi Rossi",
-        summary: "今天集中在主教堂周邊，不走回頭路，重點是登頂、洗禮堂與主教堂博物館。",
-        mapQuery: "Cattedrale di Santa Maria del Fiore Florence",
-        tips: ["這天非常適合穿好走的鞋，主教堂區石板路多。", "登頂前不要帶太多重物。"],
-        schedule: [
-          { time: "上午", label: "聖母百花大教堂登頂", note: "11:15 登頂，先排隊看地宮與教堂內部" },
-          { time: "中午前後", label: "Battistero di San Giovanni", note: "天花板壁畫非常值得看" },
-          { time: "午餐", label: "Duomo 區附近用餐", note: "可安排義大利麵或牛肚包" },
-          { time: "下午", label: "Museo dell'Opera del Duomo", note: "看天堂之門原件與雕塑" },
-          { time: "傍晚前", label: "Palazzo Medici Riccardi", note: "補一個較少人排的歷史點" }
-        ],
-        food: [
-          { name: "Trattoria ZaZa", note: "靠近中央市場，托斯卡尼料理方便安排", type: "餐廳", map: "Trattoria ZaZa Florence" },
-          { name: "I' Girone De' Ghiotti", note: "佛卡夏 / 帕尼尼，方便快速午餐", type: "餐廳", map: "I' Girone De' Ghiotti Florence" },
-          { name: "Mister Pizza", note: "在 Duomo 附近，地點方便", type: "餐廳", map: "Mister Pizza Florence" }
-        ],
-        desserts: [
-          { name: "Don Nino", note: "西西里甜點、開心果甜品", type: "甜點", map: "Don Nino Florence" },
-          { name: "Scudieri", note: "主教堂旁咖啡甜點老店", type: "甜點", map: "Scudieri Florence" }
-        ]
-      },
-      {
-        id: 4,
-        date: "4/5（日）",
-        title: "佛羅倫斯：烏菲茲・碧提宮・學院美術館",
-        city: "Florence",
-        area: "Signoria → Arno 河南岸 → Accademia",
-        stay: "Hostel Archi Rossi",
-        summary: "復活節與免費博物館日，人潮會非常多，今天重點是早起排隊與掌握節奏。",
-        mapQuery: "Galleria degli Uffizi Florence",
-        tips: ["復活節可注意 Scoppio del Carro、Colomba Pasquale。", "今天人多，不建議硬塞更多點。"],
-        schedule: [
-          { time: "07:00", label: "排烏菲茲美術館", note: "建議非常早到，今天人潮多" },
-          { time: "上午", label: "Uffizi 重點展間", note: "先抓最想看的波提切利、達文西、卡拉瓦喬" },
-          { time: "午餐", label: "領主廣場 / 老橋附近用餐", note: "補充體力後過河" },
-          { time: "下午", label: "Palazzo Pitti", note: "接著走波波里花園" },
-          { time: "下午", label: "Boboli Gardens", note: "若體力有限可抓重點區域" },
-          { time: "16:30 前", label: "排學院美術館", note: "最晚 16:30 去排比較安全" }
-        ],
-        food: [
-          { name: "Gustapizza", note: "過河後的熱門 pizza，適合排碧提宮前後", type: "餐廳", map: "Gustapizza Florence" },
-          { name: "Trattoria 4 Leoni", note: "Oltrarno 經典餐廳，適合中午坐下來吃", type: "餐廳", map: "Trattoria 4 Leoni Florence" },
-          { name: "Ristorante dei Rossi", note: "靠近學院美術館與中央車站方向", type: "餐廳", map: "Ristorante dei Rossi Florence" }
-        ],
-        desserts: [
-          { name: "Gelateria La Carraia", note: "過河後很適合順路吃 gelato", type: "甜點", map: "Gelateria La Carraia Florence" },
-          { name: "Perché No!...", note: "老字號 gelato", type: "甜點", map: "Perche No Florence" },
-          { name: "Amorini", note: "花形 gelato，適合拍照", type: "甜點", map: "Amorini Florence" }
-        ]
-      },
-      {
-        id: 5,
-        date: "4/6（一）",
-        title: "佛羅倫斯 → Siena 一日遊",
-        city: "Siena",
-        area: "San Domenico → Piazza del Campo → Siena Duomo",
-        stay: "Hostel Archi Rossi",
-        summary: "以 Siena 歷史城中心為主，走線順暢，兼顧景觀、教堂、圖書館與觀景台。",
-        mapQuery: "Piazza del Campo Siena",
-        tips: ["當天若人多，先保住 Duomo 與 Facciatone。", "公車班距遇假日可能較疏，回程時間要提前看。"],
-        schedule: [
-          { time: "早上", label: "搭 131R 公車前往 Siena", note: "建議連回程票一起買；假日班距需再確認" },
-          { time: "約 1.5 小時後", label: "San Domenico 下車", note: "先從高處看城市全景" },
-          { time: "上午", label: "Basilica di San Domenico", note: "拍城市視角" },
-          { time: "上午", label: "La Vecchia Latteria", note: "先吃一球 gelato 再慢慢走進舊城" },
-          { time: "中午前後", label: "Piazza del Campo", note: "曬太陽 + 午餐" },
-          { time: "下午", label: "Duomo di Siena", note: "外觀與內部都很精彩" },
-          { time: "下午", label: "Piccolomini Library", note: "壁畫很值得看" },
-          { time: "傍晚前", label: "Facciatone", note: "收 Siena 全景" }
-        ],
-        food: [
-          { name: "La Taverna di San Giuseppe", note: "Siena 經典托斯卡尼餐廳", type: "餐廳", map: "La Taverna di San Giuseppe Siena" },
-          { name: "Osteria da Divo", note: "氣氛佳，適合想吃正式一點", type: "餐廳", map: "Osteria da Divo Siena" },
-          { name: "Pizzeria Alle Scalette", note: "想簡單吃 pizza 可考慮", type: "餐廳", map: "Pizzeria Alle Scalette Siena" }
-        ],
-        desserts: [
-          { name: "La Vecchia Latteria", note: "你原本就排入的 gelato 店", type: "甜點", map: "La Vecchia Latteria Siena" },
-          { name: "Nannini", note: "Siena 知名甜點 / 咖啡", type: "甜點", map: "Nannini Siena" }
-        ]
-      },
-      {
-        id: 6,
-        date: "4/7（二）",
-        title: "佛羅倫斯 → 威尼斯",
-        city: "Venice",
-        area: "Venezia S. Lucia → San Marco 周邊",
-        stay: "Hotel Antigo Trovatore",
-        summary: "移動日，以入住與周邊散步為主，安排提拉米蘇、沉船書店、里阿爾托橋與超市補給。",
-        mapQuery: "Libreria Acqua Alta Venice",
-        transport: ["07:39–09:55 Italo：佛羅倫斯 → 威尼斯"],
-        tips: ["威尼斯拖行李走石橋會累，移動日不要排太緊。", "可利用超市先買水與隔天早餐。"],
-        schedule: [
-          { time: "07:39–09:55", label: "Italo 前往威尼斯", note: "抵達後先去飯店放行李" },
-          { time: "14:00 後", label: "Hotel Antigo Trovatore check-in", note: "先休息再開始今天行程" },
-          { time: "午餐後", label: "I Tre Mercanti", note: "吃提拉米蘇" },
-          { time: "下午", label: "Libreria Acqua Alta", note: "拍照熱門點" },
-          { time: "傍晚", label: "Ponte di Rialto", note: "下午光線較漂亮" },
-          { time: "傍晚", label: "Despar Teatro Italia", note: "劇院改建超市很有特色" }
-        ],
-        food: [
-          { name: "Dal Moro's", note: "外帶義大利麵，快速方便", type: "餐廳", map: "Dal Moro's Venice" },
-          { name: "Osteria alle Testiere", note: "小而精的海鮮餐廳，需留意訂位", type: "餐廳", map: "Osteria alle Testiere Venice" },
-          { name: "Bacaro Risorto", note: "想吃 cicchetti 可考慮", type: "餐廳", map: "Bacaro Risorto Venice" }
-        ],
-        desserts: [
-          { name: "I Tre Mercanti", note: "提拉米蘇重點店", type: "甜點", map: "I Tre Mercanti Venice" },
-          { name: "Suso Gelatoteca", note: "威尼斯高人氣 gelato", type: "甜點", map: "Suso Gelatoteca Venice" }
-        ]
-      },
-      {
-        id: 7,
-        date: "4/8（三）",
-        title: "威尼斯：聖馬可區完整日",
-        city: "Venice",
-        area: "San Marco",
-        stay: "Hotel Antigo Trovatore",
-        summary: "清晨拍空景，接著總督宮、嘆息橋、聖馬可教堂、露台、鳳凰劇院，再用 gondola 收尾。",
-        mapQuery: "Piazza San Marco Venice",
-        tips: ["今天以 San Marco 同區活動為主，很順。", "中午後遊客明顯變多，早拍很重要。"],
-        schedule: [
-          { time: "07:00–08:00", label: "Ponte della Paglia", note: "拍嘆息橋空景，越早越好" },
-          { time: "07:00–08:00", label: "Piazza San Marco", note: "拍空景，趁人還沒湧入" },
-          { time: "09:00", label: "Palazzo Ducale", note: "含嘆息橋參觀" },
-          { time: "午餐", label: "San Marco 周邊用餐", note: "避開主廣場正面最觀光的店" },
-          { time: "下午", label: "Basilica di San Marco", note: "記得留時間給樓上露台" },
-          { time: "下午", label: "Museum Loggia Cavalli", note: "俯瞰廣場很值得" },
-          { time: "下午", label: "Teatro La Fenice", note: "可看當日是否有可參觀時段" },
-          { time: "17:50", label: "Gondola 看夕陽", note: "約 45 分鐘" }
-        ],
-        food: [
-          { name: "Ai Mercanti", note: "離聖馬可區不遠，評價穩定", type: "餐廳", map: "Ai Mercanti Venice" },
-          { name: "Ristorante Da Carletto", note: "適合吃海鮮或燉飯", type: "餐廳", map: "Da Carletto Venice" },
-          { name: "Bacaro da Fiore", note: "小酒館型態，適合簡單吃", type: "餐廳", map: "Bacaro da Fiore Venice" }
-        ],
-        desserts: [
-          { name: "Marchini Time", note: "咖啡甜點店，離鳳凰劇院不遠", type: "甜點", map: "Marchini Time Venice" },
-          { name: "Venchi", note: "如果想找穩定的巧克力 / gelato", type: "甜點", map: "Venchi Venice San Marco" }
-        ]
-      },
-      {
-        id: 8,
-        date: "4/9（四）",
-        title: "威尼斯：學院美術館 + 彩色島 Burano",
-        city: "Venice",
-        area: "Riva degli Schiavoni → Accademia → Burano",
-        stay: "Hotel Antigo Trovatore",
-        summary: "早上先拍對岸與湖面，接著學院美術館，午後出發去彩色島。",
-        mapQuery: "Gallerie dell'Accademia Venice",
-        tips: ["若天氣不好，Burano 可縮短，保留更多市區時間。", "彩色島返程船班要提前看，避免太晚回來。"],
-        schedule: [
-          { time: "07:00–08:00", label: "Riva degli Schiavoni", note: "拍 San Giorgio Maggiore" },
-          { time: "上午", label: "Gallerie dell'Accademia", note: "看威尼斯畫派重點作品" },
-          { time: "午餐", label: "學院橋一帶用餐", note: "吃完再往 Burano" },
-          { time: "最晚 14:30", label: "出發前往 Burano", note: "預計 17:45 或 18:15 返程" },
-          { time: "下午", label: "Burano 散步拍照", note: "彩色房子、橋與運河" }
-        ],
-        food: [
-          { name: "Cantinone già Schiavi", note: "靠近學院橋的 cicchetti 名店", type: "餐廳", map: "Cantinone gia Schiavi Venice" },
-          { name: "Osteria Al Squero", note: "可和上面一起安排輕午餐", type: "餐廳", map: "Osteria Al Squero Venice" },
-          { name: "Trattoria al Gatto Nero", note: "Burano 島上知名餐廳", type: "餐廳", map: "Trattoria al Gatto Nero Burano" }
-        ],
-        desserts: [
-          { name: "Gelateria Nico", note: "Dorsoduro 經典甜點點位", type: "甜點", map: "Gelateria Nico Venice" },
-          { name: "Pasticceria Costantini", note: "Burano 小島甜點店", type: "甜點", map: "Pasticceria Costantini Burano" }
-        ]
-      },
-      {
-        id: 9,
-        date: "4/10（五）",
-        title: "威尼斯 → 米蘭",
-        city: "Milan",
-        area: "Milano Centrale → Brera → Duomo → Santa Maria delle Grazie → Navigli",
-        stay: "Ostello Bello Grande",
-        summary: "抵達米蘭後先 Brera 與午餐，再到 Duomo 區、最後的晚餐與 Navigli。",
-        mapQuery: "Duomo di Milano",
-        transport: ["07:57–10:25 Italo：威尼斯 → 米蘭"],
-        tips: ["今天雖然點多，但其實分成 Brera、Duomo、最後的晚餐、Navigli 四段。", "最後的晚餐時間固定，其他點要配合它。"],
-        schedule: [
-          { time: "07:57–10:25", label: "Italo 前往米蘭", note: "抵達後可先去住宿放行李" },
-          { time: "14:30 後", label: "Ostello Bello Grande check-in", note: "但地點就在 Centrale 旁，寄放也方便" },
-          { time: "中午前後", label: "Brera 區逛逛 + 午餐", note: "先用走逛的方式進入米蘭節奏" },
-          { time: "下午", label: "Panzerotti Luini", note: "炸餃子名店，可當點心" },
-          { time: "下午", label: "Starbucks Reserve Roastery Milano", note: "甜點、休息、免費廁所" },
-          { time: "下午", label: "Galleria Vittorio Emanuele II", note: "可順接大教堂" },
-          { time: "14:00 後", label: "Duomo di Milano", note: "下午順光拍照較美" },
-          { time: "17:00", label: "最後的晚餐", note: "16:30 前先領好票" },
-          { time: "晚上", label: "Navigli", note: "晚餐或散步收尾" }
-        ],
-        food: [
-          { name: "Panzerotti Luini", note: "經典炸餃子，離 Duomo 很近", type: "餐廳", map: "Luini Milan" },
-          { name: "Nabucco", note: "Brera 區聚餐感餐廳", type: "餐廳", map: "Nabucco Milan" },
-          { name: "Trattoria del Ciumbia", note: "Brera 風格餐廳，可試米蘭料理", type: "餐廳", map: "Trattoria del Ciumbia Milan" },
-          { name: "El Brellin", note: "Navigli 區有氣氛的晚餐選擇", type: "餐廳", map: "El Brellin Milan" }
-        ],
-        desserts: [
-          { name: "La Bottega del Gelato Cardelli Marco", note: "你原本就想去的 gelato 店", type: "甜點", map: "La Bottega del Gelato Cardelli Marco Milan" },
-          { name: "Starbucks Reserve Roastery Milano", note: "可吃甜點與休息", type: "甜點", map: "Starbucks Reserve Roastery Milan" },
-          { name: "Cioccolatitaliani", note: "Duomo 周邊方便吃甜點", type: "甜點", map: "Cioccolatitaliani Milan Duomo" }
-        ]
-      },
-      {
-        id: 10,
-        date: "4/11（六）",
-        title: "米蘭 → Lake Como 一日遊",
-        city: "Lake Como",
-        area: "Milano Centrale → Varenna → Bellagio → Varenna",
-        stay: "Ostello Bello Grande",
-        summary: "湖區一日遊，先到 Varenna 再去 Bellagio，傍晚回到 Varenna 看湖景與夕陽。",
-        mapQuery: "Varenna Esino station",
-        tips: ["湖區天氣變化快，建議帶薄外套。", "船班與火車時刻當天務必再確認。"],
-        schedule: [
-          { time: "08:20", label: "Milano Centrale → Varenna-Esino", note: "Trenitalia，約 1 小時 4 分" },
-          { time: "上午", label: "Varenna → Bellagio 渡輪", note: "約 15 分鐘" },
-          { time: "上午", label: "Salita Serbelloni", note: "Bellagio 招牌視角" },
-          { time: "上午", label: "Basilica of St. Giacomo", note: "小鎮中心可順路看" },
-          { time: "上午 / 中午", label: "Gelateria del Borgo + 午餐", note: "邊走邊吃很適合" },
-          { time: "下午", label: "I Giardini di Villa Melzi", note: "花園門票 10 歐" },
-          { time: "下午", label: "Bellagio → Varenna 渡輪", note: "回到 Varenna 續逛" },
-          { time: "下午", label: "Villa Monastero", note: "建議付費參觀花園與別墅" },
-          { time: "傍晚", label: "Passeggiata degli Innamorati", note: "拍湖景和夕陽" },
-          { time: "傍晚", label: "Varenna Caffè Bistrot", note: "湖景咖啡廳" },
-          { time: "晚上", label: "Trenitalia 返回米蘭", note: "回到市區可去超市買伴手禮" }
-        ],
-        food: [
-          { name: "Ristorante La Punta", note: "Bellagio 景觀餐廳", type: "餐廳", map: "Ristorante La Punta Bellagio" },
-          { name: "Bistrot Antichi Sapori", note: "Bellagio 小鎮內用餐方便", type: "餐廳", map: "Bistrot Antichi Sapori Bellagio" },
-          { name: "Varenna Caffè Bistrot", note: "你已排入的湖景咖啡廳", type: "餐廳", map: "Varenna Caffe Bistrot" }
-        ],
-        desserts: [
-          { name: "Gelateria del Borgo", note: "Bellagio gelato", type: "甜點", map: "Gelateria del Borgo Bellagio" },
-          { name: "Il Molo Gelateria", note: "Varenna 湖邊 gelato", type: "甜點", map: "Il Molo Gelateria Varenna" }
-        ]
-      },
-      {
-        id: 11,
-        date: "4/12（日）",
-        title: "米蘭 → 台灣",
-        city: "Transit",
-        area: "Milano Centrale → MXP",
-        stay: "飛機上",
-        summary: "返程日，若要退稅建議提早抵達機場。",
-        mapQuery: "Milan Malpensa Airport Terminal 1",
-        todos: ["前 48 小時完成線上 check-in", "整理退稅單與購物收據", "確認護照與登機證在隨身包"],
-        tips: ["若有精品購物與退稅，時間不要抓太剛好。", "你住 Centrale 旁邊，去機場動線很簡單。"],
-        schedule: [
-          { time: "早上", label: "飯店 check-out", note: "從 Ostello Bello Grande 走到 Milano Centrale 很近" },
-          { time: "建議 08:00 左右", label: "抵達 MXP", note: "若要退稅；11:15 第一航廈起飛" },
-          { time: "11:15", label: "起飛返台", note: "預計 4/13 05:40 抵達台灣" }
-        ],
-        food: [{ name: "Milano Centrale 站內早餐", note: "若時間充裕可先買簡單早餐", type: "餐廳", map: "Milano Centrale" }],
-        desserts: []
+        name: "我的收藏店家 3",
+        link: "https://maps.app.goo.gl/ohMCaCyPw6csdv9HA",
+        recommend: "待補",
+        price: "待補",
+        hours: "待補"
       }
     ];
 
-    const cityOptions = ["All", "Florence", "Siena", "Venice", "Milan", "Lake Como", "Transit"];
-    const cityColor = {
-      Florence: "#fff1f2",
-      Siena: "#fffbeb",
-      Venice: "#ecfeff",
-      Milan: "#f8fafc",
-      "Lake Como": "#ecfdf5",
-      Transit: "#f5f3ff"
-    };
+    const tripDays = [
+      { id: 1, date: "4/2（四）", title: "台灣 → Milan", city: "Transit", area: "Taoyuan Airport → MXP", stay: "飛機上", summary: "夜間出發，主要是搭機與行前確認。", mapQuery: "Taoyuan International Airport Terminal 2", todos: ["前 48 小時完成線上 check-in", "確認護照、機票、保險、信用卡", "隨身行李放保暖外套與充電設備"], tips: ["今天以休息為主。", "機上可先調整時差，盡量睡一段。"], schedule: [{ time: "23:15", label: "第二航廈起飛", note: "建議提前完成報到與安檢", map: "Taoyuan International Airport Terminal 2" }], food: [], desserts: [] },
+      { id: 2, date: "4/3（五）", title: "Milan → Florence", city: "Florence", area: "MXP → Milano Centrale → Firenze SMN → Old Town South", stay: "Hostel Archi Rossi", summary: "移動日，抵達後以 2–3 個景點為主，傍晚走老橋與米開朗基羅廣場看日落。", mapQuery: "Palazzo Vecchio Florence", transport: ["Malpensa Express：MXP → Milano Centrale（約 50 分）", "Italo：米蘭 → 佛羅倫斯（約 2 小時）"], tips: ["太陽下山後會降溫，記得帶外套。", "今天不要排太滿，重點是順利轉車與適應時差。"], schedule: [
+        { time: "07:50", label: "抵達米蘭第一航廈", note: "先出關後搭 Malpensa Express", map: "Milan Malpensa Airport Terminal 1" },
+        { time: "上午", label: "Mercato Centrale Milano 吃早餐 / 早午餐", note: "中央市場方便補給", map: "Mercato Centrale Milano" },
+        { time: "中午前後", label: "Italo 前往佛羅倫斯", note: "抵達後可先寄放行李", map: "Firenze Santa Maria Novella" },
+        { time: "15:00 後", label: "Hostel Archi Rossi check-in", note: "先稍微休息再出門", map: "Hostel Archi Rossi Florence" },
+        { time: "下午", label: "Palazzo Vecchio", note: "若體力普通，可先在領主廣場一帶慢慢走", map: "Palazzo Vecchio Florence" },
+        { time: "17:00", label: "Ponte Vecchio", note: "停留 30–60 分鐘拍照", map: "Ponte Vecchio Florence" },
+        { time: "18:30", label: "Piazzale Michelangelo", note: "推估約 19:40 日落，建議帶食物上去", map: "Piazzale Michelangelo" }
+      ], food: [
+        { name: "Mercato Centrale Milano", note: "米蘭中央市場，適合轉車空檔找東西吃", type: "餐廳", map: "Mercato Centrale Milano", recommend: "各攤位自由選", price: "€-€€", hours: "依店家" },
+        { name: "All’Antico Vinaio", note: "佛羅倫斯知名佛卡夏，適合移動日快速補給", type: "餐廳", map: "All'Antico Vinaio Florence", recommend: "招牌佛卡夏", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "La Prosciutteria Firenze", note: "冷肉拼盤、麵包，適合買了帶去看夕陽", type: "餐廳", map: "La Prosciutteria Firenze", recommend: "冷肉拼盤", price: "€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "Gelateria dei Neri", note: "佛羅倫斯高人氣 gelato", type: "Gelato", map: "Gelateria dei Neri Florence", recommend: "開心果、榛果", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Vivoli", note: "老牌甜點店，可順路買甜點", type: "甜點", map: "Vivoli Florence", recommend: "提拉米蘇", price: "€-€€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 3, date: "4/4（六）", title: "Florence：Duomo 區與 Medici", city: "Florence", area: "Duomo District", stay: "Hostel Archi Rossi", summary: "今天集中在主教堂周邊，不走回頭路，重點是登頂、洗禮堂與主教堂博物館。", mapQuery: "Cattedrale di Santa Maria del Fiore Florence", tips: ["這天非常適合穿好走的鞋，主教堂區石板路多。", "登頂前不要帶太多重物。"], schedule: [
+        { time: "上午", label: "聖母百花大教堂登頂", note: "11:15 登頂，先排隊看地宮與教堂內部", map: "Cattedrale di Santa Maria del Fiore Florence" },
+        { time: "中午前後", label: "Battistero di San Giovanni", note: "天花板壁畫非常值得看", map: "Battistero di San Giovanni Florence" },
+        { time: "午餐", label: "Duomo 區附近用餐", note: "可安排義大利麵或牛肚包", map: "Duomo Florence" },
+        { time: "下午", label: "Museo dell'Opera del Duomo", note: "看天堂之門原件與雕塑", map: "Museo dell'Opera del Duomo Florence" },
+        { time: "傍晚前", label: "Palazzo Medici Riccardi", note: "補一個較少人排的歷史點", map: "Palazzo Medici Riccardi" }
+      ], food: [
+        { name: "Trattoria ZaZa", note: "靠近中央市場，托斯卡尼料理方便安排", type: "餐廳", map: "Trattoria ZaZa Florence", recommend: "牛排、松露麵", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "I' Girone De' Ghiotti", note: "佛卡夏 / 帕尼尼，方便快速午餐", type: "餐廳", map: "I' Girone De' Ghiotti Florence", recommend: "帕尼尼", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Mister Pizza", note: "在 Duomo 附近，地點方便", type: "Pizza", map: "Mister Pizza Florence", recommend: "瑪格麗特 pizza", price: "€-€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "Don Nino", note: "西西里甜點、開心果甜品", type: "甜點", map: "Don Nino Florence", recommend: "西西里 cannoli", price: "€-€€", hours: "請以 Google Maps 為準" },
+        { name: "Scudieri", note: "主教堂旁咖啡甜點老店", type: "咖啡", map: "Scudieri Florence", recommend: "咖啡、甜點", price: "€€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 4, date: "4/5（日）", title: "Florence：Uffizi・Pitti・Accademia", city: "Florence", area: "Signoria → Arno South → Accademia", stay: "Hostel Archi Rossi", summary: "復活節與免費博物館日，人潮會非常多，今天重點是早起排隊與掌握節奏。", mapQuery: "Galleria degli Uffizi Florence", museumNotes: [{ title: "Uffizi 必看展間", items: ["2F 9-14 展間：波提切利《維納斯的誕生》、《春》", "2F 35 展間：達文西《受胎告知》、《三博士來朝》", "2F 41 展間：米開朗基羅《多尼圓窗》、拉斐爾《金翅雀聖母》", "1F 綠色展間：提香《烏爾比諾的維納斯》", "1F 紅色展間 90 室：卡拉瓦喬《梅杜莎》、《酒神》"] }], tips: ["復活節可注意 Scoppio del Carro、Colomba Pasquale。", "今天人多，不建議硬塞更多點。"], schedule: [
+        { time: "07:00", label: "排烏菲茲美術館", note: "建議非常早到，今天人潮多", map: "Galleria degli Uffizi Florence" },
+        { time: "上午", label: "Uffizi 重點展間", note: "先抓最想看的波提切利、達文西、卡拉瓦喬", map: "Galleria degli Uffizi Florence" },
+        { time: "午餐", label: "領主廣場 / 老橋附近用餐", note: "補充體力後過河", map: "Piazza della Signoria Florence" },
+        { time: "下午", label: "Palazzo Pitti", note: "接著走波波里花園", map: "Palazzo Pitti Florence" },
+        { time: "下午", label: "Boboli Gardens", note: "若體力有限可抓重點區域", map: "Boboli Gardens Florence" },
+        { time: "16:30 前", label: "排學院美術館", note: "最晚 16:30 去排比較安全", map: "Galleria dell'Accademia Florence" }
+      ], food: [
+        { name: "Gustapizza", note: "過河後的熱門 pizza，適合排碧提宮前後", type: "Pizza", map: "Gustapizza Florence", recommend: "招牌 pizza", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Trattoria 4 Leoni", note: "Oltrarno 經典餐廳，適合中午坐下來吃", type: "餐廳", map: "Trattoria 4 Leoni Florence", recommend: "松露梨子義大利麵", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "Ristorante dei Rossi", note: "靠近學院美術館與中央車站方向", type: "餐廳", map: "Ristorante dei Rossi Florence", recommend: "義大利麵", price: "€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "Gelateria La Carraia", note: "過河後很適合順路吃 gelato", type: "Gelato", map: "Gelateria La Carraia Florence", recommend: "開心果", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Perché No!...", note: "老字號 gelato", type: "Gelato", map: "Perche No Florence", recommend: "招牌 gelato", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Amorini", note: "花形 gelato，適合拍照", type: "Gelato", map: "Amorini Florence", recommend: "花形 gelato", price: "€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 5, date: "4/6（一）", title: "Florence → Siena", city: "Siena", area: "San Domenico → Campo → Siena Duomo", stay: "Hostel Archi Rossi", summary: "以 Siena 歷史城中心為主，走線順暢，兼顧景觀、教堂、圖書館與觀景台。", mapQuery: "Piazza del Campo Siena", tips: ["當天若人多，先保住 Duomo 與 Facciatone。", "公車班距遇假日可能較疏，回程時間要提前看。"], schedule: [
+        { time: "早上", label: "搭 131R 公車前往 Siena", note: "建議連回程票一起買；假日班距需再確認", map: "Florence bus station 131R Siena" },
+        { time: "約 1.5 小時後", label: "San Domenico 下車", note: "先從高處看城市全景", map: "Basilica di San Domenico Siena" },
+        { time: "上午", label: "Basilica di San Domenico", note: "拍城市視角", map: "Basilica di San Domenico Siena" },
+        { time: "上午", label: "La Vecchia Latteria", note: "先吃一球 gelato 再慢慢走進舊城", map: "La Vecchia Latteria Siena" },
+        { time: "中午前後", label: "Piazza del Campo", note: "曬太陽 + 午餐", map: "Piazza del Campo Siena" },
+        { time: "下午", label: "Duomo di Siena", note: "外觀與內部都很精彩", map: "Duomo di Siena" },
+        { time: "下午", label: "Piccolomini Library", note: "壁畫很值得看", map: "Piccolomini Library Siena" },
+        { time: "傍晚前", label: "Facciatone", note: "收 Siena 全景", map: "Facciatone Siena" }
+      ], food: [
+        { name: "La Taverna di San Giuseppe", note: "Siena 經典托斯卡尼餐廳", type: "餐廳", map: "La Taverna di San Giuseppe Siena", recommend: "野豬肉麵", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "Osteria da Divo", note: "氣氛佳，適合想吃正式一點", type: "餐廳", map: "Osteria da Divo Siena", recommend: "托斯卡尼料理", price: "€€-€€€", hours: "請以 Google Maps 為準" },
+        { name: "Pizzeria Alle Scalette", note: "想簡單吃 pizza 可考慮", type: "Pizza", map: "Pizzeria Alle Scalette Siena", recommend: "pizza", price: "€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "La Vecchia Latteria", note: "你原本就排入的 gelato 店", type: "Gelato", map: "La Vecchia Latteria Siena", recommend: "gelato", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Nannini", note: "Siena 知名甜點 / 咖啡", type: "咖啡", map: "Nannini Siena", recommend: "咖啡與甜點", price: "€-€€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 6, date: "4/7（二）", title: "Florence → Venice", city: "Venice", area: "Venezia S. Lucia → San Marco", stay: "Hotel Antigo Trovatore", summary: "移動日，以入住與周邊散步為主，安排提拉米蘇、沉船書店、里阿爾托橋與超市補給。", mapQuery: "Libreria Acqua Alta Venice", transport: ["07:39–09:55 Italo：佛羅倫斯 → 威尼斯"], tips: ["威尼斯拖行李走石橋會累，移動日不要排太緊。", "可利用超市先買水與隔天早餐。"], schedule: [
+        { time: "07:39–09:55", label: "Italo 前往威尼斯", note: "抵達後先去飯店放行李", map: "Venezia Santa Lucia station" },
+        { time: "14:00 後", label: "Hotel Antigo Trovatore check-in", note: "先休息再開始今天行程", map: "Hotel Antigo Trovatore Venice" },
+        { time: "午餐後", label: "I Tre Mercanti", note: "吃提拉米蘇", map: "I Tre Mercanti Venice" },
+        { time: "下午", label: "Libreria Acqua Alta", note: "拍照熱門點", map: "Libreria Acqua Alta Venice" },
+        { time: "傍晚", label: "Ponte di Rialto", note: "下午光線較漂亮", map: "Ponte di Rialto" },
+        { time: "傍晚", label: "Despar Teatro Italia", note: "劇院改建超市很有特色", map: "Despar Teatro Italia Venice" }
+      ], food: [
+        { name: "Dal Moro's", note: "外帶義大利麵，快速方便", type: "餐廳", map: "Dal Moro's Venice", recommend: "外帶義大利麵", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Osteria alle Testiere", note: "小而精的海鮮餐廳，需留意訂位", type: "餐廳", map: "Osteria alle Testiere Venice", recommend: "海鮮料理", price: "€€€", hours: "請以 Google Maps 為準" },
+        { name: "Bacaro Risorto", note: "想吃 cicchetti 可考慮", type: "餐廳", map: "Bacaro Risorto Venice", recommend: "cicchetti", price: "€-€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "I Tre Mercanti", note: "提拉米蘇重點店", type: "甜點", map: "I Tre Mercanti Venice", recommend: "提拉米蘇", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Suso Gelatoteca", note: "威尼斯高人氣 gelato", type: "Gelato", map: "Suso Gelatoteca Venice", recommend: "gelato", price: "€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 7, date: "4/8（三）", title: "Venice：San Marco 完整日", city: "Venice", area: "San Marco", stay: "Hotel Antigo Trovatore", summary: "清晨拍空景，接著總督宮、嘆息橋、聖馬可教堂、露台、鳳凰劇院，再用 gondola 收尾。", mapQuery: "Piazza San Marco Venice", tips: ["今天以 San Marco 同區活動為主，很順。", "中午後遊客明顯變多，早拍很重要。"], schedule: [
+        { time: "07:00–08:00", label: "Ponte della Paglia", note: "拍嘆息橋空景，越早越好", map: "Ponte della Paglia Venice" },
+        { time: "07:00–08:00", label: "Piazza San Marco", note: "拍空景，趁人還沒湧入", map: "Piazza San Marco Venice" },
+        { time: "09:00", label: "Palazzo Ducale", note: "含嘆息橋參觀", map: "Palazzo Ducale Venice" },
+        { time: "午餐", label: "San Marco 周邊用餐", note: "避開主廣場正面最觀光的店", map: "San Marco Venice" },
+        { time: "下午", label: "Basilica di San Marco", note: "記得留時間給樓上露台", map: "Basilica di San Marco" },
+        { time: "下午", label: "Museum Loggia Cavalli", note: "俯瞰廣場很值得", map: "Museo di San Marco Loggia Cavalli" },
+        { time: "下午", label: "Teatro La Fenice", note: "可看當日是否有可參觀時段", map: "Teatro La Fenice Venice" },
+        { time: "17:50", label: "Gondola 看夕陽", note: "約 45 分鐘", map: "Gondola Venice San Marco" }
+      ], food: [
+        { name: "Ai Mercanti", note: "離聖馬可區不遠，評價穩定", type: "餐廳", map: "Ai Mercanti Venice", recommend: "義大利麵", price: "€€-€€€", hours: "請以 Google Maps 為準" },
+        { name: "Ristorante Da Carletto", note: "適合吃海鮮或燉飯", type: "餐廳", map: "Da Carletto Venice", recommend: "海鮮燉飯", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "Bacaro da Fiore", note: "小酒館型態，適合簡單吃", type: "餐廳", map: "Bacaro da Fiore Venice", recommend: "cicchetti", price: "€-€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "Marchini Time", note: "咖啡甜點店，離鳳凰劇院不遠", type: "咖啡", map: "Marchini Time Venice", recommend: "咖啡、甜點", price: "€-€€", hours: "請以 Google Maps 為準" },
+        { name: "Venchi", note: "如果想找穩定的巧克力 / gelato", type: "甜點", map: "Venchi Venice San Marco", recommend: "巧克力、gelato", price: "€-€€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 8, date: "4/9（四）", title: "Venice：Accademia + Burano", city: "Venice", area: "Riva degli Schiavoni → Accademia → Burano", stay: "Hotel Antigo Trovatore", summary: "早上先拍對岸與湖面，接著學院美術館，午後出發去彩色島。", mapQuery: "Gallerie dell'Accademia Venice", tips: ["若天氣不好，Burano 可縮短，保留更多市區時間。", "彩色島返程船班要提前看，避免太晚回來。"], schedule: [
+        { time: "07:00–08:00", label: "Riva degli Schiavoni", note: "拍 San Giorgio Maggiore", map: "Riva degli Schiavoni Venice" },
+        { time: "上午", label: "Gallerie dell'Accademia", note: "看威尼斯畫派重點作品", map: "Gallerie dell'Accademia Venice" },
+        { time: "午餐", label: "學院橋一帶用餐", note: "吃完再往 Burano", map: "Accademia Bridge Venice" },
+        { time: "最晚 14:30", label: "出發前往 Burano", note: "預計 17:45 或 18:15 返程", map: "Burano Venice" },
+        { time: "下午", label: "Burano 散步拍照", note: "彩色房子、橋與運河", map: "Burano Venice" }
+      ], food: [
+        { name: "Cantinone già Schiavi", note: "靠近學院橋的 cicchetti 名店", type: "餐廳", map: "Cantinone gia Schiavi Venice", recommend: "cicchetti", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Osteria Al Squero", note: "可和上面一起安排輕午餐", type: "餐廳", map: "Osteria Al Squero Venice", recommend: "cicchetti", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Trattoria al Gatto Nero", note: "Burano 島上知名餐廳", type: "餐廳", map: "Trattoria al Gatto Nero Burano", recommend: "海鮮料理", price: "€€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "Gelateria Nico", note: "Dorsoduro 經典甜點點位", type: "Gelato", map: "Gelateria Nico Venice", recommend: "gianduiotto", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Pasticceria Costantini", note: "Burano 小島甜點店", type: "甜點", map: "Pasticceria Costantini Burano", recommend: "小甜點", price: "€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 9, date: "4/10（五）", title: "Venice → Milan", city: "Milan", area: "Milano Centrale → Brera → Duomo → Santa Maria delle Grazie → Navigli", stay: "Ostello Bello Grande", summary: "抵達米蘭後先 Brera 與午餐，再到 Duomo 區、最後的晚餐與 Navigli。", mapQuery: "Duomo di Milano", tips: ["今天雖然點多，但其實分成 Brera、Duomo、最後的晚餐、Navigli 四段。", "最後的晚餐時間固定，其他點要配合它。"], transport: ["07:57–10:25 Italo：威尼斯 → 米蘭"], schedule: [
+        { time: "07:57–10:25", label: "Italo 前往米蘭", note: "抵達後可先去住宿放行李", map: "Milano Centrale" },
+        { time: "14:30 後", label: "Ostello Bello Grande check-in", note: "地點就在 Centrale 旁，寄放也方便", map: "Ostello Bello Grande Milan" },
+        { time: "中午前後", label: "Brera 區逛逛 + 午餐", note: "先用走逛的方式進入米蘭節奏", map: "Brera Milan" },
+        { time: "下午", label: "Panzerotti Luini", note: "炸餃子名店，可當點心", map: "Luini Milan" },
+        { time: "下午", label: "Starbucks Reserve Roastery Milano", note: "甜點、休息、免費廁所", map: "Starbucks Reserve Roastery Milan" },
+        { time: "下午", label: "Galleria Vittorio Emanuele II", note: "可順接大教堂", map: "Galleria Vittorio Emanuele II" },
+        { time: "14:00 後", label: "Duomo di Milano", note: "下午順光拍照較美", map: "Duomo di Milano" },
+        { time: "17:00", label: "最後的晚餐", note: "16:30 前先領好票", map: "Santa Maria delle Grazie Milan" },
+        { time: "晚上", label: "Navigli", note: "晚餐或散步收尾", map: "Navigli Milan" }
+      ], food: [
+        { name: "Panzerotti Luini", note: "經典炸餃子，離 Duomo 很近", type: "餐廳", map: "Luini Milan", recommend: "panzerotti", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Nabucco", note: "Brera 區聚餐感餐廳", type: "餐廳", map: "Nabucco Milan", recommend: "義大利麵", price: "€€€", hours: "請以 Google Maps 為準" },
+        { name: "Trattoria del Ciumbia", note: "Brera 風格餐廳，可試米蘭料理", type: "餐廳", map: "Trattoria del Ciumbia Milan", recommend: "米蘭料理", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "El Brellin", note: "Navigli 區有氣氛的晚餐選擇", type: "餐廳", map: "El Brellin Milan", recommend: "晚餐", price: "€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "La Bottega del Gelato Cardelli Marco", note: "你原本就想去的 gelato 店", type: "Gelato", map: "La Bottega del Gelato Cardelli Marco Milan", recommend: "gelato", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Starbucks Reserve Roastery Milano", note: "可吃甜點與休息", type: "咖啡", map: "Starbucks Reserve Roastery Milan", recommend: "甜點、咖啡", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "Cioccolatitaliani", note: "Duomo 周邊方便吃甜點", type: "甜點", map: "Cioccolatitaliani Milan Duomo", recommend: "巧克力冰淇淋", price: "€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 10, date: "4/11（六）", title: "Milan → Lake Como", city: "Lake Como", area: "Milano Centrale → Varenna → Bellagio → Varenna", stay: "Ostello Bello Grande", summary: "湖區一日遊，先到 Varenna 再去 Bellagio，傍晚回到 Varenna 看湖景與夕陽。", mapQuery: "Varenna Esino station", tips: ["湖區天氣變化快，建議帶薄外套。", "船班與火車時刻當天務必再確認。"], schedule: [
+        { time: "08:20", label: "Milano Centrale → Varenna-Esino", note: "Trenitalia，約 1 小時 4 分", map: "Varenna-Esino" },
+        { time: "上午", label: "Varenna → Bellagio 渡輪", note: "約 15 分鐘", map: "Bellagio ferry" },
+        { time: "上午", label: "Salita Serbelloni", note: "Bellagio 招牌視角", map: "Salita Serbelloni Bellagio" },
+        { time: "上午", label: "Basilica of St. Giacomo", note: "小鎮中心可順路看", map: "Basilica of St. Giacomo Bellagio" },
+        { time: "上午 / 中午", label: "Gelateria del Borgo + 午餐", note: "邊走邊吃很適合", map: "Gelateria del Borgo Bellagio" },
+        { time: "下午", label: "I Giardini di Villa Melzi", note: "花園門票 10 歐", map: "I Giardini di Villa Melzi" },
+        { time: "下午", label: "Bellagio → Varenna 渡輪", note: "回到 Varenna 續逛", map: "Varenna ferry" },
+        { time: "下午", label: "Villa Monastero", note: "建議付費參觀花園與別墅", map: "Villa Monastero" },
+        { time: "傍晚", label: "Passeggiata degli Innamorati", note: "拍湖景和夕陽", map: "Passeggiata degli Innamorati Varenna" },
+        { time: "傍晚", label: "Varenna Caffè Bistrot", note: "湖景咖啡廳", map: "Varenna Caffe Bistrot" },
+        { time: "晚上", label: "Trenitalia 返回米蘭", note: "回到市區可去超市買伴手禮", map: "Milano Centrale" }
+      ], food: [
+        { name: "Ristorante La Punta", note: "Bellagio 景觀餐廳", type: "餐廳", map: "Ristorante La Punta Bellagio", recommend: "湖景午餐", price: "€€€", hours: "請以 Google Maps 為準" },
+        { name: "Bistrot Antichi Sapori", note: "Bellagio 小鎮內用餐方便", type: "餐廳", map: "Bistrot Antichi Sapori Bellagio", recommend: "義大利麵", price: "€€", hours: "請以 Google Maps 為準" },
+        { name: "Varenna Caffè Bistrot", note: "你已排入的湖景咖啡廳", type: "咖啡", map: "Varenna Caffe Bistrot", recommend: "咖啡與輕食", price: "€€", hours: "請以 Google Maps 為準" }
+      ], desserts: [
+        { name: "Gelateria del Borgo", note: "Bellagio gelato", type: "Gelato", map: "Gelateria del Borgo Bellagio", recommend: "gelato", price: "€", hours: "請以 Google Maps 為準" },
+        { name: "Il Molo Gelateria", note: "Varenna 湖邊 gelato", type: "Gelato", map: "Il Molo Gelateria Varenna", recommend: "gelato", price: "€", hours: "請以 Google Maps 為準" }
+      ] },
+      { id: 11, date: "4/12（日）", title: "Milan → 台灣", city: "Transit", area: "Milano Centrale → MXP", stay: "飛機上", summary: "返程日，若要退稅建議提早抵達機場。", mapQuery: "Milan Malpensa Airport Terminal 1", todos: ["前 48 小時完成線上 check-in", "整理退稅單與購物收據", "確認護照與登機證在隨身包"], tips: ["若有精品購物與退稅，時間不要抓太剛好。", "你住 Centrale 旁邊，去機場動線很簡單。"], schedule: [
+        { time: "早上", label: "飯店 check-out", note: "從 Ostello Bello Grande 走到 Milano Centrale 很近", map: "Ostello Bello Grande Milan" },
+        { time: "建議 08:00 左右", label: "抵達 MXP", note: "若要退稅；11:15 第一航廈起飛", map: "Milan Malpensa Airport Terminal 1" },
+        { time: "11:15", label: "起飛返台", note: "預計 4/13 05:40 抵達台灣", map: "Milan Malpensa Airport Terminal 1" }
+      ], food: [{ name: "Milano Centrale 站內早餐", note: "若時間充裕可先買簡單早餐", type: "餐廳", map: "Milano Centrale", recommend: "簡單早餐", price: "€", hours: "依店家" }], desserts: [] }
+    ];
 
+    const cityOptions = ["All", "Milan", "Florence", "Siena", "Venice", "Lake Como", "Transit"];
+    const cityColor = { Milan: "#f8fafc", Florence: "#fff1f2", Siena: "#fffbeb", Venice: "#ecfeff", "Lake Como": "#ecfdf5", Transit: "#f5f3ff" };
     let selectedCity = "All";
     let openDay = 2;
     let compactMode = false;
-
     const cityChipsEl = document.getElementById('cityChips');
     const dayListEl = document.getElementById('dayList');
     const dayCardEl = document.getElementById('dayCard');
     const modeBtn = document.getElementById('modeBtn');
 
-    function mapLink(query, label) {
-      return `<a class="map-link" href="https://www.google.com/maps/search/${encodeURIComponent(query)}" target="_blank" rel="noreferrer"><div class="item-name">${label}</div><div class="food-note">點一下直接打開 Google Maps 導航</div><div class="tag">${query}</div></a>`;
+    function getFilteredDays() { return selectedCity === 'All' ? tripDays : tripDays.filter(d => d.city === selectedCity); }
+    function getCurrentDay() { const filtered = getFilteredDays(); return filtered.find(d => d.id === openDay) || filtered[0] || tripDays[0]; }
+    function areaFlow(area) {
+      const parts = area.split('→').map(s => s.trim()).filter(Boolean);
+      return `<div class="area-flow">${parts.map((part, i) => `<div class="area-node">${part}</div>${i < parts.length - 1 ? '<div class="arrow">→</div>' : ''}`).join('')}</div>`;
     }
-
     function foodCard(item) {
-      return `<a class="food-card" href="https://www.google.com/maps/search/${encodeURIComponent(item.map || item.name)}" target="_blank" rel="noreferrer"><div class="item-name">${item.name}</div><div class="food-note">${item.note}</div><div class="tag">${item.type}</div></a>`;
-    }
-
-    function getFilteredDays() {
-      return selectedCity === 'All' ? tripDays : tripDays.filter(d => d.city === selectedCity);
-    }
-
-    function getCurrentDay() {
-      const filtered = getFilteredDays();
-      return filtered.find(d => d.id === openDay) || filtered[0] || tripDays[0];
+      const link = item.link || `https://www.google.com/maps/search/${encodeURIComponent(item.map || item.name)}`;
+      return `<a class="food-card" href="${link}" target="_blank" rel="noreferrer"><div class="item-name">${item.name}</div><div class="food-note">${item.note || ''}</div><div class="food-note"><strong>推薦品項：</strong>${item.recommend || '請自訂'}</div><div class="food-note"><strong>價位：</strong>${item.price || '請自訂'}</div><div class="food-note"><strong>營業時間：</strong>${item.hours || '請以 Google Maps 為準'}</div><div class="tag">${item.type || '收藏'}</div></a>`;
     }
 
     function renderChips() {
-      cityChipsEl.innerHTML = cityOptions.map(city => `
-        <button class="chip ${selectedCity === city ? 'active' : ''}" data-city="${city}">${city === 'All' ? '全部' : city}</button>
-      `).join('');
-
-      cityChipsEl.querySelectorAll('.chip').forEach(btn => {
-        btn.addEventListener('click', () => {
-          selectedCity = btn.dataset.city;
-          const filtered = getFilteredDays();
-          if (!filtered.some(d => d.id === openDay)) openDay = filtered[0]?.id || 1;
-          renderAll();
-        });
-      });
+      cityChipsEl.innerHTML = cityOptions.map(city => `<button class="chip ${selectedCity === city ? 'active' : ''}" data-city="${city}">${city === 'All' ? 'All' : city}</button>`).join('');
+      cityChipsEl.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => {
+        selectedCity = btn.dataset.city;
+        const filtered = getFilteredDays();
+        if (!filtered.some(d => d.id === openDay)) openDay = filtered[0]?.id || 1;
+        renderAll();
+      }));
     }
 
     function renderDayList() {
       const filtered = getFilteredDays();
-      dayListEl.innerHTML = filtered.map(day => `
-        <button class="day-btn ${day.id === openDay ? 'active' : ''}" data-id="${day.id}">
-          <div class="day-date">${day.date}</div>
-          <div class="day-title">${day.title}</div>
-          <div class="day-area">${day.area}</div>
-        </button>
-      `).join('');
-
-      dayListEl.querySelectorAll('.day-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          openDay = Number(btn.dataset.id);
-          renderAll();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
+      dayListEl.innerHTML = filtered.map(day => `<button class="day-btn ${day.id === openDay ? 'active' : ''}" data-id="${day.id}"><div class="day-date">${day.date}</div><div class="day-title">${day.title}</div><div class="day-area">${day.area}</div></button>`).join('');
+      dayListEl.querySelectorAll('.day-btn').forEach(btn => btn.addEventListener('click', () => {
+        openDay = Number(btn.dataset.id);
+        renderAll();
+        setTimeout(() => document.getElementById('todaySchedule')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      }));
     }
 
     function renderDayCard() {
       const day = getCurrentDay();
-      const visibleSchedule = compactMode
-        ? day.schedule.filter((item, index) => index < 5 || String(item.time).includes(':'))
-        : day.schedule;
-
+      const visibleSchedule = compactMode ? day.schedule.filter((item, index) => index < 5 || String(item.time).includes(':')) : day.schedule;
       dayCardEl.innerHTML = `
         <div class="day-head">
           <div class="eyebrow">${day.date}</div>
           <h3>${day.title}</h3>
           <div class="summary">${day.summary}</div>
-          <div class="badges">
-            <span class="badge" style="background:${cityColor[day.city] || '#fafaf9'}">${day.city}</span>
-            <span class="badge">${day.area}</span>
-            <span class="badge">住宿：${day.stay || '—'}</span>
-          </div>
+          <div class="badges"><span class="badge" style="background:${cityColor[day.city] || '#fafaf9'}">${day.city}</span><span class="badge">${day.area}</span><span class="badge">住宿：${day.stay || '—'}</span></div>
         </div>
-
         <div class="content-grid">
           <div>
-            <div class="section-title">今日行程</div>
+            <div class="section-title" id="todaySchedule">今日行程</div>
             <div class="stack">
-              ${visibleSchedule.map(item => `
-                <div class="item">
-                  <div class="item-top">
-                    <div class="item-name">${item.label}</div>
-                    <div class="item-time">${item.time}</div>
-                  </div>
-                  <div class="item-note">${item.note || ''}</div>
-                </div>
-              `).join('')}
+              ${visibleSchedule.map(item => `<a class="item schedule-link" href="https://www.google.com/maps/search/${encodeURIComponent(item.map || item.label)}" target="_blank" rel="noreferrer"><div class="item-top"><div class="item-name">${item.label}</div><div class="item-time">${item.time}</div></div><div class="item-note">${item.note || ''}</div><div class="tag">點此導航</div></a>`).join('')}
             </div>
-
-            ${day.transport?.length ? `
-              <div style="margin-top:16px">
-                <div class="section-title">交通重點</div>
-                <div class="stack">
-                  ${day.transport.map(t => `<div class="note-box blue">${t}</div>`).join('')}
-                </div>
-              </div>
-            ` : ''}
-
-            ${day.todos?.length ? `
-              <div style="margin-top:16px">
-                <div class="section-title">待辦提醒</div>
-                <div class="stack">
-                  ${day.todos.map(t => `<div class="note-box amber">${t}</div>`).join('')}
-                </div>
-              </div>
-            ` : ''}
-
-            <div style="margin-top:16px">
-              <div class="section-title">導航</div>
-              <div class="stack">
-                ${mapLink(day.mapQuery, '打開今日主要區域地圖')}
-                <div class="quick-nav">
-                  ${visibleSchedule.slice(0,4).map(item => `<a href="https://www.google.com/maps/search/${encodeURIComponent(item.label)}" target="_blank" rel="noreferrer"><strong>${item.label}</strong><br><span style="color:#78716c">點我導航</span></a>`).join('')}
-                </div>
-              </div>
-            </div>
+            ${day.museumNotes?.length ? `<div style="margin-top:16px"><div class="section-title">展間 / 觀賞重點</div><div class="stack">${day.museumNotes.map(box => `<div class="museum-box"><div class="item-name">${box.title}</div><ul>${box.items.map(i => `<li>${i}</li>`).join('')}</ul></div>`).join('')}</div></div>` : ''}
+            ${day.transport?.length ? `<div style="margin-top:16px"><div class="section-title">交通重點</div><div class="stack">${day.transport.map(t => `<div class="note-box blue">${t}</div>`).join('')}</div></div>` : ''}
+            ${day.todos?.length ? `<div style="margin-top:16px"><div class="section-title">待辦提醒</div><div class="stack">${day.todos.map(t => `<div class="note-box amber">${t}</div>`).join('')}</div></div>` : ''}
+            <div style="margin-top:16px"><div class="section-title">主要活動區</div><div class="area-box">${areaFlow(day.area)}</div></div>
           </div>
-
           <div>
             <div class="section-title">附近可吃的餐廳</div>
-            <div class="stack">
-              ${day.food.length ? day.food.map(foodCard).join('') : '<div class="item-note">今天以移動或搭機為主，餐食可彈性安排。</div>'}
-            </div>
-
-            <div style="margin-top:16px">
-              <div class="section-title">甜點 / gelato / 咖啡</div>
-              <div class="stack">
-                ${day.desserts.length ? day.desserts.map(foodCard).join('') : '<div class="item-note">今天沒有特別安排甜點點位。</div>'}
-              </div>
-            </div>
-
-            <div style="margin-top:16px">
-              <div class="section-title">住宿 / 區域提醒</div>
-              <div class="item">
-                <div><strong>住宿：</strong>${day.stay || '—'}</div>
-                <div><strong>主要活動區：</strong>${day.area}</div>
-                <div class="food-note" style="margin-top:8px">這天已依照你原本的安排，盡量維持同區動線與不走回頭路的原則。</div>
-              </div>
-            </div>
-
-            <div style="margin-top:16px">
-              <div class="section-title">小提醒</div>
-              <div class="stack">
-                ${day.tips.map(t => `<div class="note-box green">${t}</div>`).join('')}
-              </div>
-            </div>
+            <div class="stack">${day.food.length ? day.food.map(foodCard).join('') : '<div class="item-note">今天以移動或搭機為主，餐食可彈性安排。</div>'}</div>
+            <div style="margin-top:16px"><div class="section-title">甜點 / Gelato / 咖啡</div><div class="stack">${day.desserts.length ? day.desserts.map(foodCard).join('') : '<div class="item-note">今天沒有特別安排甜點點位。</div>'}</div></div>
+            <div style="margin-top:16px"><div class="section-title">我的收藏店家</div><div class="stack">${savedSpots.map(foodCard).join('')}</div><div class="item-note" style="margin-top:8px">你給的是 Google Maps 短連結，我先保留連結並預留欄位；店名、推薦品項、價位、營業時間可再補上精確資訊。</div></div>
+            <div style="margin-top:16px"><div class="section-title">住宿 / 區域提醒</div><div class="item"><div><strong>住宿：</strong>${day.stay || '—'}</div><div><strong>主要活動區：</strong>${day.area}</div><div class="food-note" style="margin-top:8px">這天已依照你原本的安排，盡量維持同區動線與不走回頭路的原則。</div></div></div>
+            <div style="margin-top:16px"><div class="section-title">小提醒</div><div class="stack">${day.tips.map(t => `<div class="note-box green">${t}</div>`).join('')}</div></div>
           </div>
-        </div>
-      `;
+        </div>`;
     }
 
     function renderAll() {
@@ -764,12 +404,7 @@
       modeBtn.textContent = compactMode ? '目前：精簡模式' : '目前：完整模式';
       modeBtn.classList.toggle('active', compactMode);
     }
-
-    modeBtn.addEventListener('click', () => {
-      compactMode = !compactMode;
-      renderAll();
-    });
-
+    modeBtn.addEventListener('click', () => { compactMode = !compactMode; renderAll(); });
     renderAll();
   </script>
 </body>
