@@ -25,6 +25,9 @@
     .budget-row{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-top:8px}.budget-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;background:#fff}
     .map-actions{display:flex;flex-wrap:wrap;gap:8px}.floating-top{position:fixed;right:16px;bottom:18px;width:48px;height:48px;border-radius:999px;border:none;background:var(--primary);color:#fff;box-shadow:var(--shadow);font-size:20px;cursor:pointer;display:none;z-index:50}.floating-top.show{display:block}
     @media (min-width:960px){.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:end}.layout{grid-template-columns:330px minmax(0,1fr);align-items:start}.content-grid{grid-template-columns:1.02fr .98fr}.toolbar{flex-direction:row;justify-content:space-between;align-items:start}}
+    .ctrl-btn{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:3px 7px;font-size:12px;cursor:pointer;line-height:1.4;transition:background .15s}.ctrl-btn:hover{background:#e7e5e4}.ctrl-btn:disabled{opacity:.35;cursor:default}.edit-controls{display:flex;gap:3px;flex-shrink:0;margin-left:6px}
+    .transit-type-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;margin-right:6px}.italo-badge{background:#fef3c7;color:#92400e}.trenitalia-badge{background:#dcfce7;color:#166534}.bus-badge{background:#dbeafe;color:#1e40af}.metro-badge{background:#ede9fe;color:#4c1d95}.ship-badge{background:#e0f2fe;color:#075985}
+    .move-panel{display:none;margin-top:8px;padding:10px 12px;background:var(--soft);border-radius:12px;border:1px solid var(--line)}
   </style>
 </head>
 <body>
@@ -97,13 +100,77 @@
     
     // 取得心得與儲存心得的函數
     const getDiary = (dayId) => localStorage.getItem(`trip_diary_${dayId}`) || '';
-    const saveDiary = (dayId) => { 
+    const saveDiary = (dayId) => {
       const text = document.getElementById('diary_text')?.value || '';
       localStorage.setItem(`trip_diary_${dayId}`, text);
       alert('心得已儲存！');
     };
 
-    const buildDayMapUrl = (day) => { const points = day.schedule.map(s => s.map || s.label).filter(Boolean); if (!points.length) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(day.mapQuery)}`; const destination = points[points.length - 1]; const waypoints = points.slice(0, -1).join('|'); return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}&travelmode=walking`; };
+    // === 景點排序、刪除、移動 ===
+    const getEffectiveSchedule = (day) => {
+      try { const s = localStorage.getItem(`trip_schedule_${day.id}`); if (s !== null) return JSON.parse(s); } catch(e) {}
+      return day.schedule.map(item => Object.assign({}, item));
+    };
+    const saveSchedule = (dayId, schedule) => localStorage.setItem(`trip_schedule_${dayId}`, JSON.stringify(schedule));
+    const moveItemUp = (dayId, index) => {
+      const day = tripDays.find(d => d.id === dayId);
+      const sch = getEffectiveSchedule(day);
+      if (index <= 0) return;
+      [sch[index-1], sch[index]] = [sch[index], sch[index-1]];
+      saveSchedule(dayId, sch); renderAll();
+    };
+    const moveItemDown = (dayId, index) => {
+      const day = tripDays.find(d => d.id === dayId);
+      const sch = getEffectiveSchedule(day);
+      if (index >= sch.length - 1) return;
+      [sch[index], sch[index+1]] = [sch[index+1], sch[index]];
+      saveSchedule(dayId, sch); renderAll();
+    };
+    const deleteScheduleItem = (dayId, index) => {
+      if (!confirm('確定刪除此景點？')) return;
+      const day = tripDays.find(d => d.id === dayId);
+      const sch = getEffectiveSchedule(day);
+      sch.splice(index, 1);
+      saveSchedule(dayId, sch); renderAll();
+    };
+    const toggleMovePanel = (panelId) => {
+      const el = document.getElementById(panelId);
+      if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    };
+    const moveItemToDay = (fromDayId, index, toDayId) => {
+      const fromDay = tripDays.find(d => d.id === fromDayId);
+      const toDay = tripDays.find(d => d.id === toDayId);
+      const fromSch = getEffectiveSchedule(fromDay);
+      const toSch = getEffectiveSchedule(toDay);
+      const [item] = fromSch.splice(index, 1);
+      toSch.push(item);
+      saveSchedule(fromDayId, fromSch);
+      saveSchedule(toDayId, toSch);
+      openDay = toDayId;
+      renderAll();
+    };
+
+    // === 大眾運輸時刻表 ===
+    const getTransit = (dayId) => { try { const s = localStorage.getItem(`trip_transit_${dayId}`); if (s) return JSON.parse(s); } catch(e) {} return []; };
+    const saveTransit = (dayId, entries) => localStorage.setItem(`trip_transit_${dayId}`, JSON.stringify(entries));
+    const addTransit = (dayId) => {
+      const type = document.getElementById('tr_type').value;
+      const route = document.getElementById('tr_route').value.trim();
+      const dep = document.getElementById('tr_dep').value.trim();
+      const arr = document.getElementById('tr_arr').value.trim();
+      const note = document.getElementById('tr_note').value.trim();
+      if (!route) { alert('請填寫路線'); return; }
+      const entries = getTransit(dayId);
+      entries.push({ type, route, dep, arr, note });
+      saveTransit(dayId, entries); renderAll();
+    };
+    const deleteTransit = (dayId, index) => {
+      const entries = getTransit(dayId);
+      entries.splice(index, 1);
+      saveTransit(dayId, entries); renderAll();
+    };
+
+    const buildDayMapUrl = (day) => { const points = getEffectiveSchedule(day).map(s => s.map || s.label).filter(Boolean); if (!points.length) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(day.mapQuery)}`; const destination = points[points.length - 1]; const waypoints = points.slice(0, -1).join('|'); return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}&travelmode=walking`; };
 
     async function fetchWeather() {
       try {
@@ -137,7 +204,9 @@
     function renderDayCard() {
       const day = getCurrentDay();
       const cityFood = cityRestaurants[day.city] || [];
-      const visibleSchedule = compactMode ? day.schedule.filter((item,index)=>index<5||String(item.time).includes(':')) : day.schedule;
+      const effectiveSchedule = getEffectiveSchedule(day);
+      const totalItems = effectiveSchedule.length;
+      const visibleItems = (compactMode ? effectiveSchedule.map((item,i)=>({item,i})).filter(({item},idx)=>idx<5||String(item.time).includes(':')) : effectiveSchedule.map((item,i)=>({item,i})));
       const foodList = cityFood.filter(x => !["Gelato","咖啡","烘焙","甜點"].includes(x[1])).slice(0,14).map(([name,type,map,recommend,price])=>({name,type,map,recommend,price}));
       const dessertList = cityFood.filter(x => ["Gelato","咖啡","烘焙","甜點"].includes(x[1])).slice(0,12).map(([name,type,map,recommend,price])=>({name,type,map,recommend,price}));
       const restrooms = cityRestrooms[day.city] || cityRestrooms.Transit || [];
@@ -157,10 +226,11 @@
           <div>
             <div class="section-title">今日行程</div>
             <div class="stack" id="todaySchedule">
-              ${visibleSchedule.map((item,i)=>{ const key = `${day.id}_${i}`; return `<div class="item"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><div class="item-time">${item.time}</div></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a></div>`; }).join('')}
+              ${visibleItems.map(({item,i})=>{ const key = `${day.id}_${i}`; const mpId = `mvp_${day.id}_${i}`; return `<div class="item"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><div style="display:flex;align-items:center;flex-shrink:0"><span class="item-time" style="margin-right:4px">${item.time||''}</span><div class="edit-controls"><button class="ctrl-btn" onclick="moveItemUp(${day.id},${i})" title="上移"${i===0?' disabled':''}>↑</button><button class="ctrl-btn" onclick="moveItemDown(${day.id},${i})" title="下移"${i===totalItems-1?' disabled':''}>↓</button><button class="ctrl-btn" onclick="deleteScheduleItem(${day.id},${i})" title="刪除" style="color:#dc2626">✕</button><button class="ctrl-btn" onclick="toggleMovePanel('${mpId}')" title="移至其他天">移</button></div></div></div><div id="${mpId}" class="move-panel"><div style="font-size:13px;font-weight:700;margin-bottom:6px;color:#44403c">移至哪一天？</div><div style="display:flex;flex-wrap:wrap;gap:6px">${tripDays.filter(d=>d.id!==day.id).map(d=>`<button class="chip" style="padding:6px 10px;font-size:12px" onclick="moveItemToDay(${day.id},${i},${d.id})">${d.date} ${d.title}</button>`).join('')}</div></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a></div>`; }).join('')}
             </div>
             ${day.museumNotes?.length ? `<div style="margin-top:16px"><div class="section-title">展間 / 觀賞重點</div><div class="stack">${day.museumNotes.map(box => `<div class="museum-box"><div class="item-name">${box.title}</div><ul>${box.items.map(i => `<li>${i}</li>`).join('')}</ul></div>`).join('')}</div></div>` : ''}
             ${day.transport?.length ? `<div style="margin-top:16px"><div class="section-title">交通重點</div><div class="stack">${day.transport.map(t => `<div class="note-box blue">${t}</div>`).join('')}</div></div>` : ''}
+            ${(()=>{ const typeBadge={'Italo':'italo-badge','Trenitalia':'trenitalia-badge','公車':'bus-badge','地鐵':'metro-badge','船/渡輪':'ship-badge','Vaporetto':'ship-badge'}; const entries=getTransit(day.id); return `<div style="margin-top:16px"><div class="section-title">大眾運輸時刻表</div>${entries.length?`<div class="stack" style="margin-bottom:12px">${entries.map((e,idx)=>`<div class="item"><div class="item-top"><div class="item-name"><span class="transit-type-badge ${typeBadge[e.type]||'italo-badge'}">${e.type}</span>${e.route}</div><button class="ctrl-btn" onclick="deleteTransit(${day.id},${idx})" style="color:#dc2626;flex-shrink:0" title="刪除">✕</button></div>${e.dep||e.arr?`<div class="mini">出發：${e.dep||'—'}&nbsp;→&nbsp;抵達：${e.arr||'—'}</div>`:''} ${e.note?`<div class="item-note">${e.note}</div>`:''}</div>`).join('')}</div>`:'<div class="mini" style="margin-bottom:10px;color:#78716c">尚無時刻表，可在下方新增班次。</div>'}<div class="museum-box"><div style="font-weight:700;margin-bottom:10px;font-size:14px">＋ 新增班次</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><select id="tr_type" class="budget-input"><option>Italo</option><option>Trenitalia</option><option>公車</option><option>地鐵</option><option>船/渡輪</option><option>Vaporetto</option></select><input id="tr_route" class="budget-input" placeholder="路線（如 佛羅倫斯→威尼斯）"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><input id="tr_dep" class="budget-input" placeholder="出發時間（07:39）"><input id="tr_arr" class="budget-input" placeholder="抵達時間（09:55）"></div><input id="tr_note" class="budget-input" style="width:100%;margin-bottom:10px" placeholder="備註（班次、月台、票種…）"><button class="primary-btn" onclick="addTransit(${day.id})">新增班次</button></div></div>`; })()}
             ${day.todos?.length ? `<div style="margin-top:16px"><div class="section-title">待辦提醒</div><div class="stack">${day.todos.map(t => `<div class="note-box amber">${t}</div>`).join('')}</div></div>` : ''}
             <div style="margin-top:16px"><div class="section-title">住宿</div>${simpleLinkCard(day.stay?.[0] || '住宿', day.stay?.[1] || day.mapQuery)}</div>
             <div style="margin-top:16px"><div class="section-title">今日地圖 / 離線提示</div><div class="map-actions"><a class="primary-btn" href="${buildDayMapUrl(day)}" target="_blank" rel="noreferrer">查看今日地圖</a><button class="ghost-btn" onclick="alert('目前這個單檔版本很適合加入主畫面，瀏覽器通常會保留快取。若要真正完整離線版，需要再加 service worker 檔案。')">離線使用說明</button></div></div>
