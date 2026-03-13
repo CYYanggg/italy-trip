@@ -40,7 +40,8 @@
     .area-flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.area-node{padding:10px 13px;border-radius:14px;background:linear-gradient(135deg,#FEF3E3,#FAE8CC);border:1px solid #DFC9A8;font-size:13px;color:var(--primary);font-weight:600}.arrow{color:var(--accent);font-weight:700;font-size:16px}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.weather-card,.budget-card{background:var(--soft);border:1px solid var(--line);border-radius:18px;padding:12px}.weather-card .label,.budget-card .label{font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:700}.weather-card .value,.budget-card .value{margin-top:4px;font-size:13px;font-weight:700;color:var(--text)}
     .budget-row{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-top:8px}.budget-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;background:var(--card);font-family:'Lato','Noto Sans TC',sans-serif;color:var(--text)}
-    .map-actions{display:flex;flex-wrap:wrap;gap:8px}.floating-top{position:fixed;right:16px;bottom:18px;width:48px;height:48px;border-radius:999px;border:none;background:var(--primary);color:#FDF3E3;box-shadow:0 6px 20px rgba(140,43,24,.4);font-size:20px;cursor:pointer;display:none;z-index:50}.floating-top.show{display:block}
+    .map-actions{display:flex;flex-wrap:wrap;gap:8px}
+    .collapsible{margin-top:16px}.collapsible summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--primary);font-family:'Playfair Display','Noto Serif TC',Georgia,serif;letter-spacing:.02em;padding:2px 0;user-select:none}.collapsible summary::-webkit-details-marker{display:none}.collapsible summary::before{content:'';display:inline-block;width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0}.collapsible summary::after{content:'▾';font-size:13px;color:var(--accent);margin-left:auto;transition:transform .2s;font-style:normal}.collapsible[open]>summary::after{transform:rotate(180deg)}.collapsible-body{margin-top:10px}.floating-top{position:fixed;right:16px;bottom:18px;width:48px;height:48px;border-radius:999px;border:none;background:var(--primary);color:#FDF3E3;box-shadow:0 6px 20px rgba(140,43,24,.4);font-size:20px;cursor:pointer;display:none;z-index:50}.floating-top.show{display:block}
     @media (max-width:700px){.stats{grid-template-columns:1fr;gap:7px}.stat{display:flex;align-items:center;gap:12px;padding:10px 14px}.stat .k{white-space:nowrap;margin:0;flex-shrink:0}.stat .v{margin:0;text-align:right;flex:1}}
     @media (min-width:960px){.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:end}.layout{grid-template-columns:330px minmax(0,1fr);align-items:start}.content-grid{grid-template-columns:1.02fr .98fr}.toolbar{flex-direction:row;justify-content:space-between;align-items:start}}
     .ctrl-btn{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:3px 7px;font-size:12px;cursor:pointer;line-height:1.4;transition:background .15s;color:var(--muted)}.ctrl-btn:hover{background:#EDD8BC;color:var(--primary)}.ctrl-btn:disabled{opacity:.35;cursor:default}.edit-controls{display:flex;gap:3px;flex-shrink:0;margin-left:6px}
@@ -282,11 +283,21 @@
 
           </div>
           <div>
-            <div class="section-title">附近可吃的餐廳</div>
-            <div class="chips" id="foodTabs" style="margin-bottom:10px"><button class="chip active" data-type="all">全部</button><button class="chip" data-type="餐廳">正餐</button><button class="chip" data-type="Pizza">Pizza</button><button class="chip" data-type="小吃">小吃</button><button class="chip" data-type="Gelato">Gelato</button><button class="chip" data-type="咖啡">咖啡</button><button class="chip" data-type="甜點">甜點</button></div>
-            <div class="stack" id="foodContainer">${[...foodList,...dessertList].map(foodCard).join('')}</div>
-            <div style="margin-top:16px"><div class="section-title">廁所據點</div><div class="stack">${restrooms.map(([name,map]) => simpleLinkCard(name,map)).join('')}</div></div>
-            <div style="margin-top:16px"><div class="section-title">超市</div><div class="stack">${supermarkets.map(([name,map]) => simpleLinkCard(name,map)).join('')}</div></div>
+            <details class="collapsible">
+              <summary>附近可吃的餐廳</summary>
+              <div class="collapsible-body">
+                <div class="chips" id="foodTabs" style="margin-bottom:10px"><button class="chip active" data-type="all">全部</button><button class="chip" data-type="餐廳">正餐</button><button class="chip" data-type="Pizza">Pizza</button><button class="chip" data-type="小吃">小吃</button><button class="chip" data-type="Gelato">Gelato</button><button class="chip" data-type="咖啡">咖啡</button><button class="chip" data-type="甜點">甜點</button></div>
+                <div class="stack" id="foodContainer">${[...foodList,...dessertList].map(foodCard).join('')}</div>
+              </div>
+            </details>
+            <details class="collapsible">
+              <summary>廁所據點</summary>
+              <div class="collapsible-body stack">${restrooms.map(([name,map]) => simpleLinkCard(name,map)).join('')}</div>
+            </details>
+            <details class="collapsible">
+              <summary>超市</summary>
+              <div class="collapsible-body stack">${supermarkets.map(([name,map]) => simpleLinkCard(name,map)).join('')}</div>
+            </details>
             <div style="margin-top:16px"><div class="section-title">小提醒</div><div class="stack">${day.tips.map(t => `<div class="note-box green">${t}</div>`).join('')}</div></div>
           </div>
         </div>`;
