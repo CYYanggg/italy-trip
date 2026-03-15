@@ -47,6 +47,18 @@
     .ctrl-btn{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:3px 7px;font-size:12px;cursor:pointer;line-height:1.4;transition:background .15s;color:var(--muted)}.ctrl-btn:hover{background:#EDD8BC;color:var(--primary)}.ctrl-btn:disabled{opacity:.35;cursor:default}.edit-controls{display:flex;gap:3px;flex-shrink:0;margin-left:6px}
     .move-panel{display:none;margin-top:8px;padding:10px 12px;background:var(--soft);border-radius:12px;border:1px solid var(--line)}
     .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:10px}.photo-thumb{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:1px solid var(--line)}.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}.photo-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:999px;border:none;background:rgba(44,26,14,.55);color:#fff;font-size:12px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}.photo-upload-label{display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--line);border-radius:14px;padding:14px;cursor:pointer;color:var(--muted);font-size:14px;background:var(--soft);transition:border-color .2s,color .2s}.photo-upload-label:hover{border-color:var(--accent);color:var(--accent)}
+    .sched-item{border:1px solid var(--line);border-radius:18px;background:var(--card);position:relative;overflow:hidden;touch-action:pan-y;user-select:none}
+    .sched-content{padding:13px;position:relative;background:var(--card);border-radius:18px;will-change:transform}
+    .swipe-del-bg{position:absolute;inset:0;background:#dc2626;display:flex;align-items:center;padding-left:20px;color:#fff;font-weight:700;font-size:14px;border-radius:18px}
+    .sched-item.drag-active .sched-content{box-shadow:0 8px 24px rgba(140,43,24,.25);opacity:.82}
+    .booked-label{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);margin-top:8px;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+    .booked-label input[type="checkbox"]{accent-color:var(--primary);cursor:pointer;margin:0}
+    .booked-label.checked{background:#FEF8EC;color:var(--gold);border-color:var(--gold)}
+    .photo-entry{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);margin-bottom:8px}
+    .photo-entry img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+    .photo-entry-footer{display:flex;border-top:1px solid var(--line)}
+    .photo-caption-input{flex:1;border:none;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:transparent;outline:none}
+    .photo-del-inline{border:none;border-left:1px solid var(--line);padding:6px 12px;font-size:12px;color:#dc2626;background:transparent;cursor:pointer;font-family:inherit;flex-shrink:0}
   </style>
 </head>
 <body>
@@ -62,7 +74,6 @@
 
     <section class="toolbar panel">
       <div><div class="toolbar-title">城市篩選</div><div class="chips" id="cityChips"></div></div>
-      <div><div class="toolbar-title">旅途模式</div><button class="mode-btn" id="modeBtn">目前：完整模式</button></div>
     </section>
 
     <section class="layout">
@@ -100,11 +111,10 @@
 
     const cityOptions = ["All","佛羅倫斯","西恩那","威尼斯","米蘭","科莫湖","Transit"];
     const cityColor = {佛羅倫斯:"#F5DDD0",西恩那:"#F7ECC8",威尼斯:"#C8E4F5",米蘭:"#EAE8F0",科莫湖:"#C8ECDC",Transit:"#EDE5F5"};
-    let selectedCity = "All", openDay = 2, compactMode = false;
+    let selectedCity = "All", openDay = 2;
     const cityChipsEl = document.getElementById('cityChips');
     const dayListEl = document.getElementById('dayList');
     const dayCardEl = document.getElementById('dayCard');
-    const modeBtn = document.getElementById('modeBtn');
     const topBtn = document.getElementById('topBtn');
 
     const getFilteredDays = () => selectedCity === 'All' ? tripDays : tripDays.filter(d => d.city === selectedCity);
@@ -117,12 +127,15 @@
     const getBudget = (dayId) => { try { return JSON.parse(localStorage.getItem(`trip_budget_${dayId}`) || '{}'); } catch(e){ return {}; } };
     const saveBudget = (dayId) => { const payload = { food: document.getElementById('budget_food')?.value || '', transport: document.getElementById('budget_transport')?.value || '', snacks: document.getElementById('budget_snacks')?.value || '' }; localStorage.setItem(`trip_budget_${dayId}`, JSON.stringify(payload)); renderAll(); };
     
-    // 取得心得與儲存心得的函數
     const getDiary = (dayId) => localStorage.getItem(`trip_diary_${dayId}`) || '';
-    const saveDiary = (dayId) => {
-      const text = document.getElementById('diary_text')?.value || '';
-      localStorage.setItem(`trip_diary_${dayId}`, text);
-      alert('心得已儲存！');
+    const saveDiaryQuiet = (dayId) => { const t = document.getElementById('diary_text')?.value || ''; localStorage.setItem(`trip_diary_${dayId}`, t); };
+
+    const getBooked = (dayId) => { try { return JSON.parse(localStorage.getItem(`trip_booked_${dayId}`) || '{}'); } catch(e) { return {}; } };
+    const setBooked = (dayId, idx, val) => {
+      const b = getBooked(dayId); if (val) b[idx] = true; else delete b[idx];
+      localStorage.setItem(`trip_booked_${dayId}`, JSON.stringify(b));
+      const lbl = document.querySelector(`.sched-item[data-idx="${idx}"] .booked-label`);
+      if (lbl) lbl.classList.toggle('checked', val);
     };
 
     // === 景點排序、刪除、移動 ===
@@ -171,9 +184,10 @@
 
 
     // === 照片上傳 ===
-    const getPhotos = (dayId) => { try { return JSON.parse(localStorage.getItem(`trip_photos_${dayId}`) || '[]'); } catch(e) { return []; } };
+    const getPhotos = (dayId) => { try { const raw = JSON.parse(localStorage.getItem(`trip_photos_${dayId}`) || '[]'); return raw.map(p => typeof p === 'string' ? {src:p,caption:''} : p); } catch(e) { return []; } };
     const savePhotos = (dayId, photos) => localStorage.setItem(`trip_photos_${dayId}`, JSON.stringify(photos));
     const deletePhoto = (dayId, index) => { const p = getPhotos(dayId); p.splice(index,1); savePhotos(dayId,p); renderAll(); };
+    const updatePhotoCaption = (dayId, idx, caption) => { const p = getPhotos(dayId); if (p[idx]) { p[idx].caption = caption; savePhotos(dayId, p); } };
     const addPhotos = (dayId, files) => {
       const photos = getPhotos(dayId);
       const slots = 12 - photos.length;
@@ -190,7 +204,7 @@
             if (w > max || h > max) { if (w > h) { h = Math.round(h*max/w); w = max; } else { w = Math.round(w*max/h); h = max; } }
             canvas.width = w; canvas.height = h;
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            photos.push(canvas.toDataURL('image/jpeg', 0.72));
+            photos.push({src: canvas.toDataURL('image/jpeg', 0.72), caption: ''});
             if (++done === list.length) { savePhotos(dayId, photos); renderAll(); }
           };
           img.src = e.target.result;
@@ -234,14 +248,14 @@
       const day = getCurrentDay();
       const cityFood = cityRestaurants[day.city] || [];
       const effectiveSchedule = getEffectiveSchedule(day);
-      const totalItems = effectiveSchedule.length;
-      const visibleItems = (compactMode ? effectiveSchedule.map((item,i)=>({item,i})).filter(({item},idx)=>idx<5||String(item.time).includes(':')) : effectiveSchedule.map((item,i)=>({item,i})));
       const foodList = cityFood.filter(x => !["Gelato","咖啡","烘焙","甜點"].includes(x[1])).slice(0,14).map(([name,type,map,recommend,price])=>({name,type,map,recommend,price}));
       const dessertList = cityFood.filter(x => ["Gelato","咖啡","烘焙","甜點"].includes(x[1])).slice(0,12).map(([name,type,map,recommend,price])=>({name,type,map,recommend,price}));
       const restrooms = cityRestrooms[day.city] || cityRestrooms.Transit || [];
       const supermarkets = citySupermarkets[day.city] || citySupermarkets.Transit || [];
       const budget = getBudget(day.id);
       const diaryText = getDiary(day.id);
+      const photos = getPhotos(day.id);
+      const booked = getBooked(day.id);
       const total = (Number(budget.food || 0) + Number(budget.transport || 0) + Number(budget.snacks || 0)) || 0;
 
       dayCardEl.innerHTML = `
@@ -254,42 +268,32 @@
         <div class="content-grid">
           <div>
             <div class="section-title">今日行程</div>
+            <div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">長按拖曳排序・右划刪除</div>
             <div class="stack" id="todaySchedule">
-              ${visibleItems.map(({item,i})=>{ const key = `${day.id}_${i}`; const mpId = `mvp_${day.id}_${i}`; return `<div class="item"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><div style="display:flex;align-items:center;flex-shrink:0"><span class="item-time" style="margin-right:4px">${item.time||''}</span><div class="edit-controls"><button class="ctrl-btn" onclick="moveItemUp(${day.id},${i})" title="上移"${i===0?' disabled':''}>↑</button><button class="ctrl-btn" onclick="moveItemDown(${day.id},${i})" title="下移"${i===totalItems-1?' disabled':''}>↓</button><button class="ctrl-btn" onclick="deleteScheduleItem(${day.id},${i})" title="刪除" style="color:#dc2626">✕</button><button class="ctrl-btn" onclick="toggleMovePanel('${mpId}')" title="移至其他天">移</button></div></div></div><div id="${mpId}" class="move-panel"><div style="font-size:13px;font-weight:700;margin-bottom:6px;color:#44403c">移至哪一天？</div><div style="display:flex;flex-wrap:wrap;gap:6px">${tripDays.filter(d=>d.id!==day.id).map(d=>`<button class="chip" style="padding:6px 10px;font-size:12px" onclick="moveItemToDay(${day.id},${i},${d.id})">${d.date} ${d.title}</button>`).join('')}</div></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a></div>`; }).join('')}
+              ${effectiveSchedule.map((item,i)=>{ const key=`${day.id}_${i}`; const isBooked=!!booked[i]; return `<div class="sched-item" data-idx="${i}" data-dayid="${day.id}"><div class="swipe-del-bg">🗑 刪除</div><div class="sched-content"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><span class="item-time">${item.time||''}</span></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a><label class="booked-label${isBooked?' checked':''}" onclick="event.stopPropagation()"><input type="checkbox" ${isBooked?'checked':''} onchange="setBooked(${day.id},${i},this.checked)">已訂票／訂位</label></div></div>`; }).join('')}
             </div>
             ${day.museumNotes?.length ? `<div style="margin-top:16px"><div class="section-title">展間 / 觀賞重點</div><div class="stack">${day.museumNotes.map(box => `<div class="museum-box"><div class="item-name">${box.title}</div><ul>${box.items.map(i => `<li>${i}</li>`).join('')}</ul></div>`).join('')}</div></div>` : ''}
             ${day.transport?.length ? `<div style="margin-top:16px"><div class="section-title">交通重點</div><div class="stack">${day.transport.map(t => `<div class="note-box blue">${t}</div>`).join('')}</div></div>` : ''}
             ${day.todos?.length ? `<div style="margin-top:16px"><div class="section-title">待辦提醒</div><div class="stack">${day.todos.map(t => `<div class="note-box amber">${t}</div>`).join('')}</div></div>` : ''}
+            <div style="margin-top:16px">
+              <div class="section-title">附近可吃的餐廳</div>
+              <div class="chips" id="foodTabs" style="margin-bottom:10px"><button class="chip active" data-type="all">全部</button><button class="chip" data-type="餐廳">正餐</button><button class="chip" data-type="Pizza">Pizza</button><button class="chip" data-type="小吃">小吃</button><button class="chip" data-type="Gelato">Gelato</button><button class="chip" data-type="咖啡">咖啡</button><button class="chip" data-type="甜點">甜點</button></div>
+              <div class="stack" id="foodContainer">${[...foodList,...dessertList].map(foodCard).join('')}</div>
+            </div>
             <div style="margin-top:16px"><div class="section-title">住宿</div>${simpleLinkCard(day.stay?.[0] || '住宿', day.stay?.[1] || day.mapQuery)}</div>
-            <div style="margin-top:16px"><div class="section-title">今日地圖</div><div class="map-actions"><a class="primary-btn" href="${buildDayMapUrl(day)}" target="_blank" rel="noreferrer">查看今日地圖</a></div></div>
-            <div style="margin-top:16px"><div class="section-title">主要活動區域</div><div class="link-card">${areaFlow(day.area)}</div></div>
+            <div style="margin-top:16px"><div class="section-title">主要活動區域</div><div class="link-card">${areaFlow(day.area)}<a class="primary-btn" style="display:inline-block;margin-top:12px" href="${buildDayMapUrl(day)}" target="_blank" rel="noreferrer">查看今日地圖</a></div></div>
             <div style="margin-top:16px"><div class="section-title">天氣 / 日出日落</div><div class="grid2"><div class="weather-card"><div class="label">目前氣溫</div><div class="value weather-temp">${day.weather.temp}</div></div><div class="weather-card"><div class="label">降雨</div><div class="value">${day.weather.rain}</div></div><div class="weather-card"><div class="label">日出</div><div class="value">${day.weather.sunrise}</div></div><div class="weather-card"><div class="label">日落</div><div class="value">${day.weather.sunset}</div></div></div><div class="mini">精準預報接近出發前再補最準。</div></div>
             <div style="margin-top:16px"><div class="section-title">今日預算</div><div class="budget-card"><div class="budget-row"><input id="budget_food" class="budget-input" type="number" inputmode="decimal" placeholder="餐費 €" value="${budget.food||''}"><input id="budget_transport" class="budget-input" type="number" inputmode="decimal" placeholder="交通 €" value="${budget.transport||''}"></div><div class="budget-row"><input id="budget_snacks" class="budget-input" type="number" inputmode="decimal" placeholder="甜點 / 咖啡 €" value="${budget.snacks||''}"><button class="primary-btn" onclick="saveBudget(${day.id})">儲存預算</button></div><div class="value" style="margin-top:10px">今日合計：€ ${total}</div></div></div>
-            
             <div style="margin-top:16px">
-              <div class="section-title">今日心得</div>
+              <div class="section-title">今日記錄</div>
               <div class="budget-card">
-                <textarea id="diary_text" style="width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:14px; background:var(--card); font-family:inherit; resize:vertical; min-height:100px; color:var(--text)" placeholder="記錄今天的風景、趣事或心情...">${diaryText}</textarea>
-                <button class="primary-btn" style="margin-top:8px; width:100%" onclick="saveDiary(${day.id})">儲存心得</button>
+                <textarea id="diary_text" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;background:var(--card);font-family:inherit;resize:vertical;min-height:80px;color:var(--text)" placeholder="記錄今天的風景、趣事或心情..." onblur="saveDiaryQuiet(${day.id})">${diaryText}</textarea>
+                ${photos.length ? `<div style="margin-top:10px">${photos.map((p,idx)=>`<div class="photo-entry"><img src="${p.src}" alt="照片 ${idx+1}"><div class="photo-entry-footer"><input class="photo-caption-input" type="text" value="${(p.caption||'').replace(/"/g,'&quot;')}" placeholder="加上說明…" onchange="updatePhotoCaption(${day.id},${idx},this.value)"><button class="photo-del-inline" onclick="deletePhoto(${day.id},${idx})">刪除</button></div></div>`).join('')}</div>` : ''}
+                <label class="photo-upload-label" style="margin-top:${photos.length?'0':'0'}px"><input type="file" accept="image/*" multiple style="display:none" onchange="addPhotos(${day.id},this.files)">＋ 新增照片${photos.length ? ` (${photos.length}/12)` : ''}</label>
               </div>
             </div>
-
-            <div style="margin-top:16px">
-              <div class="section-title">今日照片</div>
-              <div class="budget-card">
-                ${(()=>{ const photos=getPhotos(day.id); return `${photos.length?`<div class="photo-grid">${photos.map((src,idx)=>`<div class="photo-thumb"><img src="${src}" alt="照片 ${idx+1}"><button class="photo-del" onclick="deletePhoto(${day.id},${idx})" title="刪除">✕</button></div>`).join('')}</div>`:''}<label class="photo-upload-label"><input type="file" accept="image/*" multiple style="display:none" onchange="addPhotos(${day.id},this.files)">＋ 上傳照片${photos.length?` (${photos.length}/12)`:''}</label>`; })()}
-              </div>
-            </div>
-
           </div>
           <div>
-            <details class="collapsible">
-              <summary>附近可吃的餐廳</summary>
-              <div class="collapsible-body">
-                <div class="chips" id="foodTabs" style="margin-bottom:10px"><button class="chip active" data-type="all">全部</button><button class="chip" data-type="餐廳">正餐</button><button class="chip" data-type="Pizza">Pizza</button><button class="chip" data-type="小吃">小吃</button><button class="chip" data-type="Gelato">Gelato</button><button class="chip" data-type="咖啡">咖啡</button><button class="chip" data-type="甜點">甜點</button></div>
-                <div class="stack" id="foodContainer">${[...foodList,...dessertList].map(foodCard).join('')}</div>
-              </div>
-            </details>
             <details class="collapsible">
               <summary>廁所據點</summary>
               <div class="collapsible-body stack">${restrooms.map(([name,map]) => simpleLinkCard(name,map)).join('')}</div>
@@ -303,30 +307,120 @@
         </div>`;
 
       const tabs = document.querySelectorAll('#foodTabs .chip');
-      const cards = document.querySelectorAll('#foodContainer .food-card');
+      const foodCards = document.querySelectorAll('#foodContainer .food-card');
       tabs.forEach(tab => tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         const type = tab.dataset.type;
-        cards.forEach(card => {
+        foodCards.forEach(card => {
           if (type === 'all') { card.style.display = 'block'; return; }
           const tagEl = card.querySelector('.tag');
-          const cardType = tagEl ? tagEl.dataset.tag : '';
-          card.style.display = cardType === type ? 'block' : 'none';
+          card.style.display = (tagEl?.dataset.tag === type) ? 'block' : 'none';
         });
       }));
+
+      initScheduleInteractions(day.id);
+    }
+
+    function initScheduleInteractions(dayId) {
+      const stack = document.getElementById('todaySchedule');
+      if (!stack) return;
+      stack.querySelectorAll('.sched-item').forEach(el => {
+        const content = el.querySelector('.sched-content');
+        let state = 'idle'; // idle | swiping | dragging | cancelled
+        let startX = 0, startY = 0, curX = 0;
+        let longPressTimer = null;
+
+        el.addEventListener('touchstart', e => {
+          if (state !== 'idle') return;
+          const t = e.touches[0];
+          startX = t.clientX; startY = t.clientY; curX = 0;
+          longPressTimer = setTimeout(() => {
+            state = 'dragging';
+            el.classList.add('drag-active');
+            if (navigator.vibrate) navigator.vibrate(40);
+          }, 480);
+        }, {passive: true});
+
+        el.addEventListener('touchmove', e => {
+          const t = e.touches[0];
+          const dx = t.clientX - startX;
+          const dy = t.clientY - startY;
+
+          if (state === 'dragging') {
+            e.preventDefault();
+            const ty = t.clientY;
+            const others = [...stack.querySelectorAll('.sched-item:not(.drag-active)')];
+            let before = null;
+            for (const o of others) {
+              const r = o.getBoundingClientRect();
+              if (ty < r.top + r.height / 2) { before = o; break; }
+            }
+            if (before) stack.insertBefore(el, before); else stack.appendChild(el);
+            return;
+          }
+
+          if (state === 'idle' && Math.abs(dx) > 8) {
+            clearTimeout(longPressTimer);
+            state = (dx > 0 && Math.abs(dx) > Math.abs(dy)) ? 'swiping' : 'cancelled';
+          }
+
+          if (state === 'swiping') {
+            e.preventDefault();
+            curX = Math.max(0, dx);
+            content.style.transition = 'none';
+            content.style.transform = `translateX(${curX}px)`;
+          }
+        }, {passive: false});
+
+        const endHandler = () => {
+          clearTimeout(longPressTimer);
+          if (state === 'dragging') {
+            el.classList.remove('drag-active');
+            state = 'idle';
+            const day = tripDays.find(d => d.id === dayId);
+            const oldSch = getEffectiveSchedule(day);
+            const newSch = [...stack.querySelectorAll('.sched-item')].map(si => oldSch[+si.dataset.idx]);
+            saveSchedule(dayId, newSch);
+            renderAll();
+            return;
+          }
+          if (state === 'swiping') {
+            if (curX > 120) {
+              content.style.transition = 'transform .18s';
+              content.style.transform = `translateX(${el.offsetWidth + 20}px)`;
+              setTimeout(() => {
+                const day = tripDays.find(d => d.id === dayId);
+                const sch = getEffectiveSchedule(day);
+                sch.splice(+el.dataset.idx, 1);
+                saveSchedule(dayId, sch);
+                renderAll();
+              }, 200);
+            } else {
+              content.style.transition = 'transform .2s';
+              content.style.transform = 'translateX(0)';
+            }
+          }
+          state = 'idle'; curX = 0;
+        };
+
+        el.addEventListener('touchend', endHandler);
+        el.addEventListener('touchcancel', () => {
+          clearTimeout(longPressTimer);
+          if (state === 'swiping') { content.style.transition = 'transform .2s'; content.style.transform = 'translateX(0)'; }
+          if (state === 'dragging') el.classList.remove('drag-active');
+          state = 'idle'; curX = 0;
+        });
+      });
     }
 
     function renderAll() {
       renderChips();
       renderDayList();
       renderDayCard();
-      modeBtn.textContent = compactMode ? '目前：精簡模式' : '目前：完整模式';
-      modeBtn.classList.toggle('active', compactMode);
       fetchWeather();
     }
 
-    modeBtn.addEventListener('click', () => { compactMode = !compactMode; renderAll(); });
     window.addEventListener('scroll', () => { topBtn.classList.toggle('show', window.scrollY > 300); });
     topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     renderAll();
