@@ -49,7 +49,9 @@
     .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:10px}.photo-thumb{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:1px solid var(--line)}.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}.photo-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:999px;border:none;background:rgba(44,26,14,.55);color:#fff;font-size:12px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}.photo-upload-label{display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--line);border-radius:14px;padding:14px;cursor:pointer;color:var(--muted);font-size:14px;background:var(--soft);transition:border-color .2s,color .2s}.photo-upload-label:hover{border-color:var(--accent);color:var(--accent)}
     .sched-item{border:1px solid var(--line);border-radius:18px;background:var(--card);position:relative;overflow:hidden;touch-action:pan-y;user-select:none}
     .sched-content{padding:13px;position:relative;background:var(--card);border-radius:18px;will-change:transform}
-    .swipe-del-bg{position:absolute;inset:0;background:#dc2626;display:flex;align-items:center;padding-left:20px;color:#fff;font-weight:700;font-size:14px;border-radius:18px}
+    .swipe-del-bg{position:absolute;inset:0;background:#dc2626;display:flex;align-items:center;padding-left:12px;gap:8px;border-radius:18px}
+    .swipe-confirm-btn{border:none;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;background:#fff;color:#dc2626}
+    .swipe-cancel-btn{border:none;border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;background:rgba(255,255,255,.22);color:#fff}
     .sched-item.drag-active .sched-content{box-shadow:0 8px 24px rgba(140,43,24,.25);opacity:.82}
     .booked-label{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);margin-top:8px;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
     .booked-label input[type="checkbox"]{accent-color:var(--primary);cursor:pointer;margin:0}
@@ -189,6 +191,34 @@
     };
 
 
+    // === 刪除確認 / 重設行程 ===
+    const confirmDeleteItem = (btn) => {
+      const el = btn.closest('.sched-item');
+      const dayId = +el.dataset.dayid, idx = +el.dataset.idx;
+      const content = el.querySelector('.sched-content');
+      content.style.transition = 'transform .18s';
+      content.style.transform = `translateX(${el.offsetWidth + 20}px)`;
+      setTimeout(() => {
+        const day = tripDays.find(d => d.id === dayId);
+        const sch = getEffectiveSchedule(day);
+        sch.splice(idx, 1);
+        saveSchedule(dayId, sch);
+        renderAll();
+      }, 200);
+    };
+    const cancelDeleteItem = (btn) => {
+      const el = btn.closest('.sched-item');
+      el.classList.remove('swipe-pending');
+      const content = el.querySelector('.sched-content');
+      content.style.transition = 'transform .2s';
+      content.style.transform = 'translateX(0)';
+    };
+    const resetSchedule = (dayId) => {
+      if (!confirm('重設為原始行程？自訂的順序與新增的景點都會消失。')) return;
+      localStorage.removeItem(`trip_schedule_${dayId}`);
+      renderAll();
+    };
+
     // === 新增行程 ===
     const showAddItemForm = (dayId) => {
       const form = document.getElementById(`addItemForm_${dayId}`);
@@ -284,6 +314,7 @@
       const photos = getPhotos(day.id);
       const booked = getBooked(day.id);
       const total = (Number(budget.food || 0) + Number(budget.transport || 0) + Number(budget.snacks || 0)) || 0;
+      const hasCustomSchedule = localStorage.getItem(`trip_schedule_${day.id}`) !== null;
 
       dayCardEl.innerHTML = `
         <div class="day-head">
@@ -294,10 +325,13 @@
         </div>
         <div class="content-grid">
           <div>
-            <div class="section-title">今日行程</div>
-            <div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">長按拖曳排序・右划刪除</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="section-title" style="margin-bottom:0">今日行程</div>
+              ${hasCustomSchedule ? `<button class="ghost-btn" style="font-size:12px;padding:4px 10px" onclick="resetSchedule(${day.id})">重設行程</button>` : ''}
+            </div>
+            <div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">長按拖曳排序・右划顯示刪除確認</div>
             <div class="stack" id="todaySchedule">
-              ${effectiveSchedule.map((item,i)=>{ const key=`${day.id}_${i}`; const isBooked=!!booked[i]; return `<div class="sched-item" data-idx="${i}" data-dayid="${day.id}"><div class="swipe-del-bg">🗑 刪除</div><div class="sched-content"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><span class="item-time">${item.time||''}</span></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a><label class="booked-label${isBooked?' checked':''}" onclick="event.stopPropagation()"><input type="checkbox" ${isBooked?'checked':''} onchange="setBooked(${day.id},${i},this.checked)">已訂票／訂位</label></div></div>`; }).join('')}
+              ${effectiveSchedule.map((item,i)=>{ const key=`${day.id}_${i}`; const isBooked=!!booked[i]; return `<div class="sched-item" data-idx="${i}" data-dayid="${day.id}"><div class="swipe-del-bg"><button class="swipe-confirm-btn" onclick="confirmDeleteItem(this)">確認刪除</button><button class="swipe-cancel-btn" onclick="cancelDeleteItem(this)">取消</button></div><div class="sched-content"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><span class="item-time">${item.time||''}</span></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a><label class="booked-label${isBooked?' checked':''}" onclick="event.stopPropagation()"><input type="checkbox" ${isBooked?'checked':''} onchange="setBooked(${day.id},${i},this.checked)">已訂票／訂位</label></div></div>`; }).join('')}
             </div>
             <div id="addItemForm_${day.id}" class="add-item-form">
               <input id="add_label" type="text" placeholder="景點／行程名稱（必填）">
@@ -370,6 +404,12 @@
         let longPressTimer = null;
 
         el.addEventListener('touchstart', e => {
+          // Cancel any other item that's in swipe-pending state
+          stack.querySelectorAll('.sched-item.swipe-pending').forEach(p => {
+            if (p !== el) { p.classList.remove('swipe-pending'); const c = p.querySelector('.sched-content'); c.style.transition = 'transform .2s'; c.style.transform = 'translateX(0)'; }
+          });
+          // If this item is already pending, just cancel it
+          if (el.classList.contains('swipe-pending')) { el.classList.remove('swipe-pending'); const c = el.querySelector('.sched-content'); c.style.transition = 'transform .2s'; c.style.transform = 'translateX(0)'; return; }
           if (state !== 'idle') return;
           const t = e.touches[0];
           startX = t.clientX; startY = t.clientY; curX = 0;
@@ -424,16 +464,11 @@
             return;
           }
           if (state === 'swiping') {
-            if (curX > 120) {
+            if (curX > 80) {
+              // Partial reveal: show confirm/cancel buttons
               content.style.transition = 'transform .18s';
-              content.style.transform = `translateX(${el.offsetWidth + 20}px)`;
-              setTimeout(() => {
-                const day = tripDays.find(d => d.id === dayId);
-                const sch = getEffectiveSchedule(day);
-                sch.splice(+el.dataset.idx, 1);
-                saveSchedule(dayId, sch);
-                renderAll();
-              }, 200);
+              content.style.transform = 'translateX(100px)';
+              el.classList.add('swipe-pending');
             } else {
               content.style.transition = 'transform .2s';
               content.style.transform = 'translateX(0)';
