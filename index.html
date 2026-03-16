@@ -59,6 +59,12 @@
     .photo-entry-footer{display:flex;border-top:1px solid var(--line)}
     .photo-caption-input{flex:1;border:none;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:transparent;outline:none}
     .photo-del-inline{border:none;border-left:1px solid var(--line);padding:6px 12px;font-size:12px;color:#dc2626;background:transparent;cursor:pointer;font-family:inherit;flex-shrink:0}
+    .add-item-form{margin-top:10px;padding:14px;background:var(--soft);border:1px solid var(--line);border-radius:16px;display:none}
+    .add-item-form input,.add-item-form textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--card);font-family:inherit;color:var(--text);margin-bottom:8px;box-sizing:border-box}
+    .add-item-form input:focus,.add-item-form textarea:focus{outline:none;border-color:var(--accent)}
+    .add-item-actions{display:flex;gap:8px}
+    .add-item-btn{flex:1;padding:9px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit}
+    .add-item-btn.confirm{background:var(--primary);color:#FDF3E3;border-color:var(--primary)}
   </style>
 </head>
 <body>
@@ -183,6 +189,27 @@
     };
 
 
+    // === 新增行程 ===
+    const showAddItemForm = (dayId) => {
+      const form = document.getElementById(`addItemForm_${dayId}`);
+      if (!form) return;
+      const isHidden = form.style.display === 'none' || form.style.display === '';
+      form.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) form.querySelector('input')?.focus();
+    };
+    const addScheduleItem = (dayId) => {
+      const label = document.getElementById('add_label')?.value.trim();
+      if (!label) { document.getElementById('add_label')?.focus(); return; }
+      const time = document.getElementById('add_time')?.value.trim() || '';
+      const note = document.getElementById('add_note')?.value.trim() || '';
+      const map  = document.getElementById('add_map')?.value.trim() || label;
+      const day = tripDays.find(d => d.id === dayId);
+      const sch = getEffectiveSchedule(day);
+      sch.push({ label, time, note, map, move: '步行', moveNote: '' });
+      saveSchedule(dayId, sch);
+      renderAll();
+    };
+
     // === 照片上傳 ===
     const getPhotos = (dayId) => { try { const raw = JSON.parse(localStorage.getItem(`trip_photos_${dayId}`) || '[]'); return raw.map(p => typeof p === 'string' ? {src:p,caption:''} : p); } catch(e) { return []; } };
     const savePhotos = (dayId, photos) => localStorage.setItem(`trip_photos_${dayId}`, JSON.stringify(photos));
@@ -272,6 +299,17 @@
             <div class="stack" id="todaySchedule">
               ${effectiveSchedule.map((item,i)=>{ const key=`${day.id}_${i}`; const isBooked=!!booked[i]; return `<div class="sched-item" data-idx="${i}" data-dayid="${day.id}"><div class="swipe-del-bg">🗑 刪除</div><div class="sched-content"><div class="item-top"><div class="item-name"><input type="checkbox" ${isDone(key)?'checked':''} onchange="markDone('${key}')" style="margin-right:6px">${item.label}</div><span class="item-time">${item.time||''}</span></div><div class="item-note">${item.note||''}</div><div class="mini"><strong>建議移動方式：</strong>${item.move||'步行'}｜${item.moveNote||''}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map||item.label)}" target="_blank" class="tag">點此導航</a><label class="booked-label${isBooked?' checked':''}" onclick="event.stopPropagation()"><input type="checkbox" ${isBooked?'checked':''} onchange="setBooked(${day.id},${i},this.checked)">已訂票／訂位</label></div></div>`; }).join('')}
             </div>
+            <div id="addItemForm_${day.id}" class="add-item-form">
+              <input id="add_label" type="text" placeholder="景點／行程名稱（必填）">
+              <input id="add_time" type="text" placeholder="時間，例如 09:00（選填）">
+              <input id="add_note" type="text" placeholder="備註（選填）">
+              <input id="add_map" type="text" placeholder="地圖搜尋關鍵字（選填，留空同名稱）">
+              <div class="add-item-actions">
+                <button class="add-item-btn confirm" onclick="addScheduleItem(${day.id})">加入行程</button>
+                <button class="add-item-btn" onclick="showAddItemForm(${day.id})">取消</button>
+              </div>
+            </div>
+            <button class="ghost-btn" style="margin-top:10px;width:100%;border-style:dashed" onclick="showAddItemForm(${day.id})">＋ 新增景點</button>
             ${day.museumNotes?.length ? `<div style="margin-top:16px"><div class="section-title">展間 / 觀賞重點</div><div class="stack">${day.museumNotes.map(box => `<div class="museum-box"><div class="item-name">${box.title}</div><ul>${box.items.map(i => `<li>${i}</li>`).join('')}</ul></div>`).join('')}</div></div>` : ''}
             ${day.transport?.length ? `<div style="margin-top:16px"><div class="section-title">交通重點</div><div class="stack">${day.transport.map(t => `<div class="note-box blue">${t}</div>`).join('')}</div></div>` : ''}
             ${day.todos?.length ? `<div style="margin-top:16px"><div class="section-title">待辦提醒</div><div class="stack">${day.todos.map(t => `<div class="note-box amber">${t}</div>`).join('')}</div></div>` : ''}
